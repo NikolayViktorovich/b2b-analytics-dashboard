@@ -15,7 +15,7 @@ export const useAuthStore = create<AuthStore>()(
       isAuth: false,
       token: null,
 
-      login: async (email: string, pwd: string) => {
+      login: async (email: string, _pwd: string) => {
         await new Promise(resolve => setTimeout(resolve, 800))
         
         const mockUser: User = {

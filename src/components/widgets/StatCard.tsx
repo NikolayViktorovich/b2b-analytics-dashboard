@@ -4,42 +4,53 @@ interface Props {
   label: string
   value: string | number
   change?: number
+  subtitle?: string
 }
 
-const StatCard = ({ label, value, change }: Props) => {
+const StatCard = ({ label, value, change, subtitle }: Props) => {
   const hasChange = change !== undefined
   const isPositive = change && change > 0
 
   const cardStyle: React.CSSProperties = {
-    background: 'var(--bg-secondary)',
+    background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
-    borderRadius: 'clamp(8px, 1.5vw, 12px)',
-    padding: 'clamp(16px, 2.5vw, 20px)',
-    transition: 'transform 0.2s, box-shadow 0.2s',
+    borderRadius: '16px',
+    padding: '24px',
+    transition: 'all 0.2s',
   }
 
   const labelStyle: React.CSSProperties = {
-    fontSize: 'clamp(12px, 1.2vw, 13px)',
-    color: 'var(--text-secondary)',
-    marginBottom: 'clamp(8px, 1.5vw, 12px)',
-    fontWeight: 500,
+    fontSize: '13px',
+    color: 'var(--text-muted)',
+    marginBottom: '8px',
+    fontWeight: 400,
+    letterSpacing: '0.3px',
   }
 
   const valueStyle: React.CSSProperties = {
-    fontSize: 'clamp(22px, 3vw, 28px)',
+    fontSize: '28px',
     fontWeight: 700,
     color: 'var(--text-primary)',
-    marginBottom: 'clamp(6px, 1vw, 8px)',
+    marginBottom: '8px',
+    letterSpacing: '-0.5px',
   }
 
   const changeStyle: React.CSSProperties = {
-    fontSize: 'clamp(12px, 1.2vw, 14px)',
-    fontWeight: 600,
-    display: 'inline-block',
-    padding: 'clamp(3px, 0.5vw, 4px) clamp(6px, 1vw, 8px)',
+    fontSize: '13px',
+    fontWeight: 500,
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '4px 8px',
     borderRadius: '6px',
-    color: isPositive ? 'var(--success)' : 'var(--error)',
-    background: isPositive ? 'rgba(61, 217, 179, 0.1)' : 'rgba(255, 87, 87, 0.1)',
+    color: isPositive ? 'var(--bg-primary)' : 'var(--error)',
+    background: isPositive ? 'var(--accent-primary)' : 'rgba(255, 87, 87, 0.15)',
+  }
+
+  const subtitleStyle: React.CSSProperties = {
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+    marginTop: '8px',
   }
 
   return (
@@ -48,9 +59,10 @@ const StatCard = ({ label, value, change }: Props) => {
       <div style={valueStyle}>{value}</div>
       {hasChange && (
         <div style={changeStyle}>
-          {formatPercent(change)}
+          {isPositive ? '↑' : '↓'} {formatPercent(change)}
         </div>
       )}
+      {subtitle && <div style={subtitleStyle}>{subtitle}</div>}
     </div>
   )
 }

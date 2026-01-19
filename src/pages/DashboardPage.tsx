@@ -22,7 +22,7 @@ const DashboardPage = () => {
   const contentStyle: React.CSSProperties = {
     flex: 1,
     overflowY: 'auto',
-    padding: 'clamp(16px, 3vw, 24px)',
+    background: 'var(--bg-primary)',
   }
 
   return (

@@ -2,19 +2,31 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 :root {
-  --bg-primary: #0f1419;
-  --bg-secondary: #1a2332;
-  --bg-tertiary: #243447;
-  --accent-primary: #3dd9b3;
-  --accent-hover: #35c4a0;
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2a2a2a;
+  --bg-card: #1e1e1e;
+  --accent-primary: #c4ff61;
+  --accent-hover: #b3e856;
+  --accent-dark: #9ed147;
   --text-primary: #ffffff;
-  --text-secondary: #8b95a5;
-  --border-color: #2d3e52;
+  --text-secondary: #a0a0a0;
+  --text-muted: #6b6b6b;
+  --border-color: #333333;
   --error: #ff5757;
-  --success: #3dd9b3;
+  --success: #c4ff61;
+  --chart-green: #4ade80;
+  --chart-purple: #8b5cf6;
+  --chart-blue: #3b82f6;
+  --chart-indigo: #6366f1;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -25,11 +37,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-size: clamp(14px, 1vw, 16px);
+  font-size: clamp(14px, 1vw, 15px);
+  line-height: 1.5;
 }
 
 #root {
   min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 @media (max-width: 768px) {
@@ -43,11 +61,29 @@ button {
   cursor: pointer;
   border: none;
   outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus {
+  outline: none;
+}
+
+button::-moz-focus-inner {
+  border: 0;
 }
 
 input, select, textarea {
   font-family: inherit;
   outline: none;
+}
+
+svg, svg * {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+svg:focus, svg *:focus {
+  outline: none !important;
 }
 
 a {
@@ -67,10 +103,42 @@ a {
 ::-webkit-scrollbar-thumb {
   background: var(--bg-tertiary);
   border-radius: 4px;
+  transition: background 0.2s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-color);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
 }
 
 @media (max-width: 1024px) {

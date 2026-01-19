@@ -7,47 +7,49 @@ interface Props {
 
 const ChartWidget = ({ title, data }: Props) => {
   const cardStyle: React.CSSProperties = {
-    background: 'var(--bg-secondary)',
+    background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
-    borderRadius: 'clamp(8px, 1.5vw, 12px)',
-    padding: 'clamp(16px, 3vw, 24px)',
+    borderRadius: '16px',
+    padding: '24px',
   }
 
   const headerStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 'clamp(16px, 3vw, 24px)',
+    marginBottom: '24px',
     flexWrap: 'wrap',
-    gap: 'clamp(12px, 2vw, 16px)',
+    gap: '16px',
   }
 
   const titleStyle: React.CSSProperties = {
-    fontSize: 'clamp(16px, 2vw, 18px)',
+    fontSize: '16px',
     fontWeight: 600,
+    color: 'var(--text-primary)',
   }
 
   const tabsStyle: React.CSSProperties = {
     display: 'flex',
     gap: '8px',
-    background: 'var(--bg-tertiary)',
+    background: 'var(--bg-secondary)',
     padding: '4px',
-    borderRadius: '8px',
+    borderRadius: '10px',
   }
 
   const tabStyle: React.CSSProperties = {
     background: 'transparent',
     color: 'var(--text-secondary)',
-    padding: 'clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px)',
-    borderRadius: '6px',
-    fontSize: 'clamp(12px, 1.2vw, 13px)',
+    padding: '8px 16px',
+    borderRadius: '8px',
+    fontSize: '13px',
     fontWeight: 500,
+    transition: 'all 0.2s',
   }
 
   const tabActiveStyle: React.CSSProperties = {
     ...tabStyle,
-    background: 'var(--accent-primary)',
-    color: 'var(--bg-primary)',
+    background: 'var(--bg-card)',
+    color: 'var(--text-primary)',
   }
 
   return (
@@ -60,29 +62,34 @@ const ChartWidget = ({ title, data }: Props) => {
         </div>
       </div>
 
-      <div style={{ width: '100%', height: 'clamp(250px, 40vw, 300px)' }}>
+      <div style={{ width: '100%', height: '300px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
             <XAxis
               dataKey="name"
-              stroke="var(--text-secondary)"
-              style={{ fontSize: 'clamp(10px, 1vw, 12px)' }}
+              stroke="var(--text-muted)"
+              style={{ fontSize: '12px' }}
+              axisLine={false}
+              tickLine={false}
             />
             <YAxis
-              stroke="var(--text-secondary)"
-              style={{ fontSize: 'clamp(10px, 1vw, 12px)' }}
+              stroke="var(--text-muted)"
+              style={{ fontSize: '12px' }}
+              axisLine={false}
+              tickLine={false}
             />
             <Tooltip
               contentStyle={{
-                background: 'var(--bg-tertiary)',
+                background: 'var(--bg-card)',
                 border: '1px solid var(--border-color)',
-                borderRadius: '8px',
+                borderRadius: '10px',
                 color: 'var(--text-primary)',
-                fontSize: 'clamp(12px, 1.2vw, 14px)',
+                fontSize: '14px',
               }}
+              cursor={{ fill: 'rgba(196, 255, 97, 0.1)' }}
             />
-            <Bar dataKey="value" fill="var(--accent-primary)" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="value" fill="var(--chart-green)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

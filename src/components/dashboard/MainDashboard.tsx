@@ -1,53 +1,64 @@
-import { useState } from 'react'
-import StatCard from '@/components/widgets/StatCard'
-import ChartWidget from '@/components/widgets/ChartWidget'
-import PeriodSelector from '@/components/dashboard/PeriodSelector'
-import { formatCurrency } from '@/utils/format'
+import StatCard from '../widgets/StatCard'
+import RevenueChart from '../widgets/RevenueChart'
+import SourcesChart from '../widgets/SourcesChart'
+import ProductTable from '../widgets/ProductTable'
 
 const mockStats = [
-  { label: 'Количество продаж', value: '35 шт', change: 12.5 },
-  { label: 'Количество покупающих клиентов', value: '23', change: -5.2 },
-  { label: 'Новые клиенты', value: '12', change: 8.3 },
-  { label: 'Отмены автопродлений', value: '23', change: -15.7 },
+  { label: 'Общие продажи', value: '$210,578', change: 12.5, subtitle: 'Среднее значение продаж' },
+  { label: 'Всего заказов', value: '1245', change: -3.5, subtitle: 'Среднее количество заказов' },
+  { label: 'Конверсия', value: '8.5%', change: 4.3, subtitle: 'Средний процент конверсии' },
+  { label: 'Средний чек', value: '$150.40', change: 8.2, subtitle: 'Средняя стоимость заказа' },
 ]
 
-const mockStats2 = [
-  { label: 'Период жизни клиента', value: '5.58 месяцев' },
-  { label: 'Общие продажи', value: formatCurrency(21920) },
-  { label: 'Средний чек', value: formatCurrency(483.4) },
+const mockRevenueData = [
+  { month: 'Янв', value: 45000 },
+  { month: 'Фев', value: 52000 },
+  { month: 'Мар', value: 48000 },
+  { month: 'Апр', value: 61000 },
+  { month: 'Май', value: 55000 },
+  { month: 'Июн', value: 67000 },
+  { month: 'Июл', value: 58000 },
+  { month: 'Авг', value: 72000 },
+  { month: 'Сен', value: 65000 },
+  { month: 'Окт', value: 58000 },
+  { month: 'Ноя', value: 70000 },
+  { month: 'Дек', value: 68000 },
 ]
 
-const mockChartData = [
-  { name: 'Апрель 2022', value: 30 },
-  { name: 'Май 2022', value: 40 },
-  { name: 'Июнь 2022', value: 50 },
+const mockSourceData = [
+  { name: 'Электронная коммерция', value: 1376, color: '#6366f1' },
+  { name: 'Веб-сайт', value: 234, color: '#3b82f6' },
+  { name: 'Социальные сети', value: 850, color: '#8b5cf6' },
+]
+
+const mockProducts = [
+  { name: 'Nike Air Max Shoe', brand: 'Nike', quantity: 1250, price: 95.00, earning: 95.00 },
+  { name: 'MacBook Pro', brand: 'Apple', quantity: 1850, price: 27.00, earning: 95.00 },
+  { name: 'Nike Air Jordan', brand: 'Nike', quantity: 40, price: 34.00, earning: 95.00 },
+  { name: 'Amazon Echo', brand: 'Amazon', quantity: 95, price: 85.00, earning: 95.00 },
+  { name: 'iPhone 16 Pro Max', brand: 'Apple', quantity: 80, price: 36.00, earning: 95.00 },
 ]
 
 const MainDashboard = () => {
-  const [period, setPeriod] = useState({ start: '', end: '' })
-
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: 'clamp(8px, 2vw, 0)' }}>
-      <PeriodSelector value={period} onChange={setPeriod} />
+    <div style={{ padding: '32px', maxWidth: '100%' }}>
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '8px' }}>Аналитика продаж</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Полный отчет по аналитике и статистике</p>
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(240px, 30vw, 280px), 1fr))', gap: 'clamp(12px, 2vw, 16px)', marginBottom: 'clamp(16px, 3vw, 24px)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '24px' }}>
         {mockStats.map((stat, idx) => (
           <StatCard key={idx} {...stat} />
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(240px, 30vw, 280px), 1fr))', gap: 'clamp(12px, 2vw, 16px)', marginBottom: 'clamp(16px, 3vw, 24px)' }}>
-        {mockStats2.map((stat, idx) => (
-          <StatCard key={idx} {...stat} />
-        ))}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '24px' }}>
+        <RevenueChart data={mockRevenueData} />
+        <SourcesChart data={mockSourceData} />
       </div>
 
-      <div style={{ marginTop: 'clamp(16px, 3vw, 24px)' }}>
-        <ChartWidget
-          title="История клиентской базы"
-          data={mockChartData}
-        />
-      </div>
+      <ProductTable products={mockProducts} />
     </div>
   )
 }
