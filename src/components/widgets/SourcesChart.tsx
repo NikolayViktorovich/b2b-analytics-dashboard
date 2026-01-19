@@ -11,8 +11,17 @@ const SourcesChart = ({ data }: Props) => {
   const [clicked, setClicked] = useState(false)
   const total = data.reduce((sum, item) => sum + item.value, 0)
 
-  const renderActive = (props: any) => {
-    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props
+  const renderActive = (props: unknown) => {
+    const p = props as {
+      cx: number
+      cy: number
+      innerRadius: number
+      outerRadius: number
+      startAngle: number
+      endAngle: number
+      fill: string
+    }
+    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = p
 
     return (
       <g>
@@ -41,7 +50,7 @@ const SourcesChart = ({ data }: Props) => {
     )
   }
 
-  const handleClick = (_: any, idx: number) => {
+  const handleClick = (_: unknown, idx: number) => {
     const item = data[idx]
     const pct = ((item.value / total) * 100).toFixed(1)
     setActiveIdx(idx)
@@ -54,7 +63,7 @@ const SourcesChart = ({ data }: Props) => {
     })
   }
 
-  const handleEnter = (_: any, idx: number) => {
+  const handleEnter = (_: unknown, idx: number) => {
     if (!clicked) {
       setActiveIdx(idx)
     }

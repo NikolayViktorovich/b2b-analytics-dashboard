@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 interface P {
-  data: any[]
+  data: { month: string; value: number }[]
 }
 
 const RevenueChart = ({ data }: P) => {

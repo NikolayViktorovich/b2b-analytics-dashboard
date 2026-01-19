@@ -30,29 +30,34 @@ const PeriodSelector = ({ value, onChange }: Props) => {
     let start = ''
 
     switch (preset) {
-      case 'today':
+      case 'today': {
         start = end
         break
-      case 'week':
+      }
+      case 'week': {
         const wk = new Date(now)
         wk.setDate(now.getDate() - 7)
         start = wk.toISOString().split('T')[0]
         break
-      case 'month':
+      }
+      case 'month': {
         const mo = new Date(now)
         mo.setMonth(now.getMonth() - 1)
         start = mo.toISOString().split('T')[0]
         break
-      case 'quarter':
+      }
+      case 'quarter': {
         const qtr = new Date(now)
         qtr.setMonth(now.getMonth() - 3)
         start = qtr.toISOString().split('T')[0]
         break
-      case 'year':
+      }
+      case 'year': {
         const yr = new Date(now)
         yr.setFullYear(now.getFullYear() - 1)
         start = yr.toISOString().split('T')[0]
         break
+      }
     }
 
     onChange({ start, end })
