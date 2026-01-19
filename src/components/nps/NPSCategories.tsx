@@ -27,13 +27,15 @@ const NPSCategories = ({ categories }: Props) => {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
-    padding: '24px',
+    padding: '16px',
+    height: '400px',
     display: 'flex',
     flexDirection: 'column',
   }
 
   const headerStyle: React.CSSProperties = {
-    marginBottom: '20px',
+    marginBottom: '16px',
+    flexShrink: 0,
   }
 
   const titleStyle: React.CSSProperties = {
@@ -52,6 +54,9 @@ const NPSCategories = ({ categories }: Props) => {
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
+    flex: 1,
+    overflowY: 'auto',
+    overflowX: 'hidden',
   }
 
   const itemStyle: React.CSSProperties = {
