@@ -1,19 +1,21 @@
-interface Props {
+interface P {
   data: { stage: string; value: number; percent: number; color: string }[]
 }
 
-const SalesFunnel = ({ data }: Props) => {
+const SalesFunnel = ({ data }: P) => {
   const cardStyle: React.CSSProperties = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
-    padding: '24px',
+    padding: '16px',
+    height: '400px',
     display: 'flex',
     flexDirection: 'column',
   }
 
   const headerStyle: React.CSSProperties = {
-    marginBottom: '24px',
+    marginBottom: '16px',
+    flexShrink: 0,
   }
 
   const titleStyle: React.CSSProperties = {
@@ -26,6 +28,13 @@ const SalesFunnel = ({ data }: Props) => {
   const subtitleStyle: React.CSSProperties = {
     fontSize: '13px',
     color: 'var(--text-muted)',
+  }
+
+  const funnelWrap: React.CSSProperties = {
+    flex: 1,
+    overflowY: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
   }
 
   const funnelStyle: React.CSSProperties = {
@@ -96,6 +105,7 @@ const SalesFunnel = ({ data }: Props) => {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    flexShrink: 0,
   }
 
   const convLblStyle: React.CSSProperties = {
@@ -118,25 +128,27 @@ const SalesFunnel = ({ data }: Props) => {
         <div style={subtitleStyle}>От просмотра до покупки</div>
       </div>
 
-      <div style={funnelStyle}>
-        {data.map((stage, idx) => (
-          <div key={idx} style={stageStyle}>
-            <div style={topStyle}>
-              <span style={lblStyle}>{stage.stage}</span>
-              <span style={valStyle}>{stage.value.toLocaleString()}</span>
-            </div>
-            <div style={barWrap}>
-              <div style={barStyle(stage.percent, stage.color)}>
-                <span style={pctStyle}>{stage.percent}%</span>
+      <div style={funnelWrap}>
+        <div style={funnelStyle}>
+          {data.map((stage, idx) => (
+            <div key={idx} style={stageStyle}>
+              <div style={topStyle}>
+                <span style={lblStyle}>{stage.stage}</span>
+                <span style={valStyle}>{stage.value.toLocaleString()}</span>
+              </div>
+              <div style={barWrap}>
+                <div style={barStyle(stage.percent, stage.color)}>
+                  <span style={pctStyle}>{stage.percent}%</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div style={conversionStyle}>
-        <span style={convLblStyle}>Общая конверсия</span>
-        <span style={convValStyle}>{finalConversion}%</span>
+        <div style={conversionStyle}>
+          <span style={convLblStyle}>Общая конверсия</span>
+          <span style={convValStyle}>{finalConversion}%</span>
+        </div>
       </div>
     </div>
   )
