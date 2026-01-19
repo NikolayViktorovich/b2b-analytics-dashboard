@@ -22,7 +22,7 @@ const LoginPage = () => {
     }
   }
 
-  const containerStyle: React.CSSProperties = {
+  const container = {
     minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
@@ -31,22 +31,20 @@ const LoginPage = () => {
     background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)',
   }
 
-  const cardStyle: React.CSSProperties = {
+  const card = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '20px',
     padding: '48px',
     width: '100%',
     maxWidth: '420px',
-    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
   }
 
-
-
-  const titleStyle: React.CSSProperties = {
+  const title = {
     fontSize: '32px',
     fontWeight: 700,
-    textAlign: 'center',
+    textAlign: 'center' as const,
     marginBottom: '8px',
     background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-dark) 100%)',
     WebkitBackgroundClip: 'text',
@@ -54,32 +52,32 @@ const LoginPage = () => {
     backgroundClip: 'text',
   }
 
-  const subtitleStyle: React.CSSProperties = {
+  const subtitle = {
     color: 'var(--text-muted)',
-    textAlign: 'center',
+    textAlign: 'center' as const,
     marginBottom: '32px',
     fontSize: '15px',
   }
 
-  const formStyle: React.CSSProperties = {
+  const form = {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     gap: '20px',
   }
 
-  const fieldStyle: React.CSSProperties = {
+  const field = {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     gap: '8px',
   }
 
-  const labelStyle: React.CSSProperties = {
+  const label = {
     fontSize: '14px',
     fontWeight: 500,
     color: 'var(--text-secondary)',
   }
 
-  const inputStyle: React.CSSProperties = {
+  const input = {
     background: 'var(--bg-secondary)',
     border: '1px solid var(--border-color)',
     borderRadius: '10px',
@@ -89,7 +87,7 @@ const LoginPage = () => {
     transition: 'border-color 0.2s',
   }
 
-  const btnStyle: React.CSSProperties = {
+  const btn = {
     background: 'var(--accent-primary)',
     color: 'var(--bg-primary)',
     padding: '14px',
@@ -102,52 +100,52 @@ const LoginPage = () => {
     transition: 'all 0.2s',
   }
 
-  const errorStyle: React.CSSProperties = {
-    background: 'rgba(255, 87, 87, 0.15)',
+  const error = {
+    background: 'rgba(255,87,87,0.15)',
     border: '1px solid var(--error)',
     color: 'var(--error)',
     padding: '12px',
     borderRadius: '10px',
     fontSize: '14px',
-    textAlign: 'center',
+    textAlign: 'center' as const,
   }
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h1 style={titleStyle}>Reddix</h1>
-        <p style={subtitleStyle}>Войдите в систему</p>
+    <div style={container}>
+      <div style={card}>
+        <h1 style={title}>Reddix</h1>
+        <p style={subtitle}>Войдите в систему</p>
 
-        <form onSubmit={handleSubmit} style={formStyle}>
-          <div style={fieldStyle}>
-            <label htmlFor="email" style={labelStyle}>Email</label>
+        <form onSubmit={handleSubmit} style={form}>
+          <div style={field}>
+            <label htmlFor="email" style={label}>Email</label>
             <input
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               placeholder="admin@example.com"
-              style={inputStyle}
+              style={input}
               required
             />
           </div>
 
-          <div style={fieldStyle}>
-            <label htmlFor="pwd" style={labelStyle}>Пароль</label>
+          <div style={field}>
+            <label htmlFor="pwd" style={label}>Пароль</label>
             <input
               id="pwd"
               type="password"
               value={pwd}
-              onChange={(e) => setPwd(e.target.value)}
+              onChange={e => setPwd(e.target.value)}
               placeholder="••••••••"
-              style={inputStyle}
+              style={input}
               required
             />
           </div>
 
-          {err && <div style={errorStyle}>{err}</div>}
+          {err && <div style={error}>{err}</div>}
 
-          <button type="submit" style={btnStyle} disabled={loading}>
+          <button type="submit" style={btn} disabled={loading}>
             {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>

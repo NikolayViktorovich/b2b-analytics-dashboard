@@ -285,48 +285,46 @@ const MainDashboard = () => {
   }
 
   const renderCharts = () => {
-    const revenueIdx = order.indexOf('revenue')
-    const sourcesIdx = order.indexOf('sources')
-    const productsIdx = order.indexOf('products')
+    const revIdx = order.indexOf('revenue')
+    const srcIdx = order.indexOf('sources')
+    const prodIdx = order.indexOf('products')
     
-    const indices = [revenueIdx, sourcesIdx, productsIdx].filter(i => i !== -1).sort((a, b) => a - b)
-    const allTogether = indices.length === 3 && 
-                        indices[1] === indices[0] + 1 && 
-                        indices[2] === indices[1] + 1
+    const indices = [revIdx, srcIdx, prodIdx].filter(i => i !== -1).sort((a,b) => a - b)
+    const together = indices.length === 3 && indices[1] === indices[0] + 1 && indices[2] === indices[1] + 1
     
-    if (allTogether && order[indices[0]] === 'revenue') {
+    if(together && order[indices[0]] === 'revenue') {
       return (
         <div className="charts-grid" style={chartsGrid}>
           <div
             key="revenue"
             draggable={isEditMode}
-            onDragStart={(e) => onDragStart(e, 'revenue')}
+            onDragStart={e => onDragStart(e, 'revenue')}
             onDragOver={onDragOver}
-            onDrop={(e) => onDrop(e, 'revenue')}
+            onDrop={e => onDrop(e, 'revenue')}
             onDragEnd={onDragEnd}
-            style={{ ...widgetStyle('revenue'), gridColumn: '1', gridRow: '1' }}
+            style={{...widgetStyle('revenue'), gridColumn: '1', gridRow: '1'}}
           >
             <RevenueChart data={revData} />
           </div>
           <div
             key="sources"
             draggable={isEditMode}
-            onDragStart={(e) => onDragStart(e, 'sources')}
+            onDragStart={e => onDragStart(e, 'sources')}
             onDragOver={onDragOver}
-            onDrop={(e) => onDrop(e, 'sources')}
+            onDrop={e => onDrop(e, 'sources')}
             onDragEnd={onDragEnd}
-            style={{ ...widgetStyle('sources'), gridColumn: '2', gridRow: '1 / 3' }}
+            style={{...widgetStyle('sources'), gridColumn: '2', gridRow: '1 / 3'}}
           >
             <SourcesChart data={mockSourceData} />
           </div>
           <div
             key="products"
             draggable={isEditMode}
-            onDragStart={(e) => onDragStart(e, 'products')}
+            onDragStart={e => onDragStart(e, 'products')}
             onDragOver={onDragOver}
-            onDrop={(e) => onDrop(e, 'products')}
+            onDrop={e => onDrop(e, 'products')}
             onDragEnd={onDragEnd}
-            style={{ ...widgetStyle('products'), gridColumn: '1', gridRow: '2' }}
+            style={{...widgetStyle('products'), gridColumn: '1', gridRow: '2'}}
           >
             <ProductTable products={mockProducts} />
           </div>
@@ -413,9 +411,9 @@ const MainDashboard = () => {
       {order.map(id => {
         const statIds = ['sales', 'orders', 'conversion', 'avg']
         
-        if (statIds.includes(id)) {
+        if(statIds.includes(id)) {
           const statsInOrder = order.filter(orderId => statIds.includes(orderId))
-          if (id === statsInOrder[0]) {
+          if(id === statsInOrder[0]) {
             return (
               <div key="stats-grid" className="stats-grid" style={statsGridStyle}>
                 {statsInOrder.map(statId => renderWidget(statId))}
@@ -425,20 +423,20 @@ const MainDashboard = () => {
           return null
         }
 
-        if (id === 'revenue' || id === 'sources' || id === 'products') {
-          const revenueIdx = order.indexOf('revenue')
-          const sourcesIdx = order.indexOf('sources')
-          const productsIdx = order.indexOf('products')
+        if(id === 'revenue' || id === 'sources' || id === 'products') {
+          const revIdx = order.indexOf('revenue')
+          const srcIdx = order.indexOf('sources')
+          const prodIdx = order.indexOf('products')
           
-          const indices = [revenueIdx, sourcesIdx, productsIdx].filter(i => i !== -1).sort((a, b) => a - b)
-          const allTogether = indices.length === 3 && 
-                              indices[1] === indices[0] + 1 && 
-                              indices[2] === indices[1] + 1
+          const indices = [revIdx, srcIdx, prodIdx].filter(i => i !== -1).sort((a,b) => a - b)
+          const together = indices.length === 3 && 
+                          indices[1] === indices[0] + 1 && 
+                          indices[2] === indices[1] + 1
           
-          if (allTogether && id === order[indices[0]]) {
+          if(together && id === order[indices[0]]) {
             return renderCharts()
           }
-          if (!allTogether) {
+          if(!together) {
             return renderWidget(id)
           }
           return null

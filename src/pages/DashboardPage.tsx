@@ -11,47 +11,41 @@ const DashboardPage = () => {
   const [currView, setCurrView] = useState('desktop')
 
   const renderContent = () => {
-    switch (currView) {
-      case 'desktop':
-        return <MainDashboard />
-      case 'analytics':
-        return <AnalyticsPage />
-      case 'website':
-        return <WebsitePage />
-      case 'nps':
-        return <NPSPage />
-      case 'settings':
-        return <SettingsPage />
-      default:
-        return <MainDashboard />
+    switch(currView) {
+      case 'desktop': return <MainDashboard />
+      case 'analytics': return <AnalyticsPage />
+      case 'website': return <WebsitePage />
+      case 'nps': return <NPSPage />
+      case 'settings': return <SettingsPage />
+      default: return <MainDashboard />
     }
   }
 
-  const containerStyle: React.CSSProperties = {
+  const container = {
     display: 'flex',
     minHeight: '100vh',
     background: 'var(--bg-primary)',
   }
 
-  const mainStyle: React.CSSProperties = {
+  const main = {
     flex: 1,
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     overflow: 'hidden',
   }
 
-  const contentStyle: React.CSSProperties = {
+  const content = {
     flex: 1,
-    overflowY: 'auto',
+    overflowY: 'auto' as const,
     background: 'var(--bg-primary)',
   }
 
   return (
-    <div style={containerStyle}>
+    <div style={container}>
       <Sidebar currView={currView} onViewChange={setCurrView} />
-      <div style={mainStyle}>
+      <div style={main}>
         <Header />
-        <div style={contentStyle}>
+        <div style={content}>
           {renderContent()}
         </div>
       </div>
