@@ -8,7 +8,7 @@ const Header = () => {
     return `${d.getDate()}, ${d.toLocaleString('ru', { month: 'long' })}`
   }
 
-  const headerStyle: React.CSSProperties = {
+  const header: React.CSSProperties = {
     height: '80px',
     background: 'var(--bg-primary)',
     borderBottom: '1px solid var(--border-color)',
@@ -18,25 +18,25 @@ const Header = () => {
     padding: '0 32px',
   }
 
-  const leftStyle: React.CSSProperties = {
+  const left: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: '24px',
   }
 
-  const dateStyle: React.CSSProperties = {
+  const date: React.CSSProperties = {
     fontSize: '24px',
     fontWeight: 600,
     color: 'var(--text-primary)',
   }
 
-  const rightStyle: React.CSSProperties = {
+  const right: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: '16px',
   }
 
-  const userStyle: React.CSSProperties = {
+  const userBox: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
@@ -46,7 +46,7 @@ const Header = () => {
     border: '1px solid var(--border-color)',
   }
 
-  const avatarStyle: React.CSSProperties = {
+  const avatar: React.CSSProperties = {
     width: '36px',
     height: '36px',
     borderRadius: '50%',
@@ -59,19 +59,19 @@ const Header = () => {
     fontSize: '14px',
   }
 
-  const userInfoStyle: React.CSSProperties = {
+  const info: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     gap: '2px',
   }
 
-  const nameStyle: React.CSSProperties = {
+  const name: React.CSSProperties = {
     fontSize: '14px',
     fontWeight: 500,
     color: 'var(--text-primary)',
   }
 
-  const logoutStyle: React.CSSProperties = {
+  const btn: React.CSSProperties = {
     fontSize: '12px',
     color: 'var(--text-muted)',
     background: 'transparent',
@@ -81,19 +81,19 @@ const Header = () => {
   }
 
   return (
-    <header style={headerStyle}>
-      <div style={leftStyle}>
-        <span style={dateStyle}>{getDate()}</span>
+    <header style={header}>
+      <div style={left}>
+        <span style={date}>{getDate()}</span>
       </div>
 
-      <div style={rightStyle}>
-        <div style={userStyle}>
-          <div style={avatarStyle}>
+      <div style={right}>
+        <div style={userBox}>
+          <div style={avatar}>
             {user?.name.charAt(0).toUpperCase()}
           </div>
-          <div style={userInfoStyle}>
-            <span style={nameStyle}>{user?.name}</span>
-            <button onClick={logout} style={logoutStyle}>
+          <div style={info}>
+            <span style={name}>{user?.name}</span>
+            <button onClick={logout} style={btn}>
               Выйти
             </button>
           </div>
