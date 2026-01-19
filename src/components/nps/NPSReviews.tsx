@@ -28,13 +28,15 @@ const NPSReviews = ({ reviews }: Props) => {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
-    padding: '24px',
+    padding: '16px',
+    height: '400px',
     display: 'flex',
     flexDirection: 'column',
   }
 
   const headerStyle: React.CSSProperties = {
-    marginBottom: '20px',
+    marginBottom: '16px',
+    flexShrink: 0,
   }
 
   const titleStyle: React.CSSProperties = {
@@ -53,7 +55,7 @@ const NPSReviews = ({ reviews }: Props) => {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
-    maxHeight: '400px',
+    flex: 1,
     overflowY: 'auto',
   }
 
