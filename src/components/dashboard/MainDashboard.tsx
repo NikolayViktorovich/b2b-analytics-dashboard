@@ -193,9 +193,9 @@ const MainDashboard = () => {
     cursor: isEditMode ? 'move' : 'default',
     opacity: draggedItem === id ? 0.5 : 1,
     transition: 'opacity 0.2s',
-    border: isEditMode ? '2px dashed var(--border-color)' : 'none',
+    outline: isEditMode ? '2px dashed var(--border-color)' : 'none',
+    outlineOffset: isEditMode ? '4px' : '0',
     borderRadius: 'clamp(12px, 2vw, 16px)',
-    padding: isEditMode ? 'clamp(6px, 1vw, 8px)' : '0',
   })
 
   const statsGridStyle: React.CSSProperties = {
@@ -207,7 +207,8 @@ const MainDashboard = () => {
 
   const chartsGrid: React.CSSProperties = {
     display: 'grid',
-    gridTemplateColumns: '2fr 1fr',
+    gridTemplateColumns: '1fr 400px',
+    gridAutoRows: '400px',
     gap: 'clamp(16px, 2.5vw, 20px)',
     marginBottom: 'clamp(20px, 3vw, 24px)',
   }
@@ -273,7 +274,7 @@ const MainDashboard = () => {
             onDragOver={onDragOver}
             onDrop={(e) => onDrop(e, id)}
             onDragEnd={onDragEnd}
-            style={widgetStyle(id)}
+            style={{ ...widgetStyle(id), ...sectionStyle }}
           >
             <ProductTable products={mockProducts} />
           </div>
@@ -286,48 +287,53 @@ const MainDashboard = () => {
   const renderCharts = () => {
     const revenueIdx = order.indexOf('revenue')
     const sourcesIdx = order.indexOf('sources')
+    const productsIdx = order.indexOf('products')
     
-    if (Math.abs(revenueIdx - sourcesIdx) === 1) {
-      const first = Math.min(revenueIdx, sourcesIdx)
-      const chartIds = [order[first], order[first + 1]]
-      
+    const indices = [revenueIdx, sourcesIdx, productsIdx].filter(i => i !== -1).sort((a, b) => a - b)
+    const allTogether = indices.length === 3 && 
+                        indices[1] === indices[0] + 1 && 
+                        indices[2] === indices[1] + 1
+    
+    if (allTogether && order[indices[0]] === 'revenue') {
       return (
         <div className="charts-grid" style={chartsGrid}>
-          {chartIds.map(id => {
-            if (id === 'revenue') {
-              return (
-                <div
-                  key={id}
-                  draggable={isEditMode}
-                  onDragStart={(e) => onDragStart(e, id)}
-                  onDragOver={onDragOver}
-                  onDrop={(e) => onDrop(e, id)}
-                  onDragEnd={onDragEnd}
-                  style={widgetStyle(id)}
-                >
-                  <RevenueChart data={revData} />
-                </div>
-              )
-            } else if (id === 'sources') {
-              return (
-                <div
-                  key={id}
-                  draggable={isEditMode}
-                  onDragStart={(e) => onDragStart(e, id)}
-                  onDragOver={onDragOver}
-                  onDrop={(e) => onDrop(e, id)}
-                  onDragEnd={onDragEnd}
-                  style={widgetStyle(id)}
-                >
-                  <SourcesChart data={mockSourceData} />
-                </div>
-              )
-            }
-            return null
-          })}
+          <div
+            key="revenue"
+            draggable={isEditMode}
+            onDragStart={(e) => onDragStart(e, 'revenue')}
+            onDragOver={onDragOver}
+            onDrop={(e) => onDrop(e, 'revenue')}
+            onDragEnd={onDragEnd}
+            style={{ ...widgetStyle('revenue'), gridColumn: '1', gridRow: '1' }}
+          >
+            <RevenueChart data={revData} />
+          </div>
+          <div
+            key="sources"
+            draggable={isEditMode}
+            onDragStart={(e) => onDragStart(e, 'sources')}
+            onDragOver={onDragOver}
+            onDrop={(e) => onDrop(e, 'sources')}
+            onDragEnd={onDragEnd}
+            style={{ ...widgetStyle('sources'), gridColumn: '2', gridRow: '1 / 3' }}
+          >
+            <SourcesChart data={mockSourceData} />
+          </div>
+          <div
+            key="products"
+            draggable={isEditMode}
+            onDragStart={(e) => onDragStart(e, 'products')}
+            onDragOver={onDragOver}
+            onDrop={(e) => onDrop(e, 'products')}
+            onDragEnd={onDragEnd}
+            style={{ ...widgetStyle('products'), gridColumn: '1', gridRow: '2' }}
+          >
+            <ProductTable products={mockProducts} />
+          </div>
         </div>
       )
     }
+    
     return null
   }
 
@@ -419,13 +425,20 @@ const MainDashboard = () => {
           return null
         }
 
-        if (id === 'revenue' || id === 'sources') {
+        if (id === 'revenue' || id === 'sources' || id === 'products') {
           const revenueIdx = order.indexOf('revenue')
           const sourcesIdx = order.indexOf('sources')
-          if (Math.abs(revenueIdx - sourcesIdx) === 1 && id === order[Math.min(revenueIdx, sourcesIdx)]) {
+          const productsIdx = order.indexOf('products')
+          
+          const indices = [revenueIdx, sourcesIdx, productsIdx].filter(i => i !== -1).sort((a, b) => a - b)
+          const allTogether = indices.length === 3 && 
+                              indices[1] === indices[0] + 1 && 
+                              indices[2] === indices[1] + 1
+          
+          if (allTogether && id === order[indices[0]]) {
             return renderCharts()
           }
-          if (Math.abs(revenueIdx - sourcesIdx) !== 1) {
+          if (!allTogether) {
             return renderWidget(id)
           }
           return null
