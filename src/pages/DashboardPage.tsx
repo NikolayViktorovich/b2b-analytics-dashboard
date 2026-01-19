@@ -3,6 +3,9 @@ import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
 import MainDashboard from '@/components/dashboard/MainDashboard'
 import NPSPage from './NPSPage'
+import AnalyticsPage from './AnalyticsPage'
+import WebsitePage from './WebsitePage'
+import SettingsPage from './SettingsPage'
 
 const DashboardPage = () => {
   const [currView, setCurrView] = useState('desktop')
@@ -11,8 +14,14 @@ const DashboardPage = () => {
     switch (currView) {
       case 'desktop':
         return <MainDashboard />
+      case 'analytics':
+        return <AnalyticsPage />
+      case 'website':
+        return <WebsitePage />
       case 'nps':
         return <NPSPage />
+      case 'settings':
+        return <SettingsPage />
       default:
         return <MainDashboard />
     }
