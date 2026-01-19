@@ -9,9 +9,9 @@ interface Props {
 
 const StatCard = ({ label, value, change, subtitle }: Props) => {
   const hasChange = change !== undefined
-  const isPositive = change && change > 0
+  const pos = change && change > 0
 
-  const cardStyle: React.CSSProperties = {
+  const card: React.CSSProperties = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
@@ -19,7 +19,7 @@ const StatCard = ({ label, value, change, subtitle }: Props) => {
     transition: 'all 0.2s',
   }
 
-  const labelStyle: React.CSSProperties = {
+  const lbl: React.CSSProperties = {
     fontSize: '13px',
     color: 'var(--text-muted)',
     marginBottom: '8px',
@@ -27,7 +27,7 @@ const StatCard = ({ label, value, change, subtitle }: Props) => {
     letterSpacing: '0.3px',
   }
 
-  const valueStyle: React.CSSProperties = {
+  const val: React.CSSProperties = {
     fontSize: '28px',
     fontWeight: 700,
     color: 'var(--text-primary)',
@@ -35,7 +35,7 @@ const StatCard = ({ label, value, change, subtitle }: Props) => {
     letterSpacing: '-0.5px',
   }
 
-  const changeStyle: React.CSSProperties = {
+  const chg: React.CSSProperties = {
     fontSize: '13px',
     fontWeight: 500,
     display: 'inline-flex',
@@ -43,26 +43,26 @@ const StatCard = ({ label, value, change, subtitle }: Props) => {
     gap: '4px',
     padding: '4px 8px',
     borderRadius: '6px',
-    color: isPositive ? 'var(--bg-primary)' : 'var(--error)',
-    background: isPositive ? 'var(--accent-primary)' : 'rgba(255, 87, 87, 0.15)',
+    color: pos ? 'var(--bg-primary)' : 'var(--error)',
+    background: pos ? 'var(--accent-primary)' : 'rgba(255,87,87,0.15)',
   }
 
-  const subtitleStyle: React.CSSProperties = {
+  const sub: React.CSSProperties = {
     fontSize: '12px',
     color: 'var(--text-muted)',
     marginTop: '8px',
   }
 
   return (
-    <div style={cardStyle}>
-      <div style={labelStyle}>{label}</div>
-      <div style={valueStyle}>{value}</div>
+    <div style={card}>
+      <div style={lbl}>{label}</div>
+      <div style={val}>{value}</div>
       {hasChange && (
-        <div style={changeStyle}>
-          {isPositive ? '↑' : '↓'} {formatPercent(change)}
+        <div style={chg}>
+          {pos ? '↑' : '↓'} {formatPercent(change)}
         </div>
       )}
-      {subtitle && <div style={subtitleStyle}>{subtitle}</div>}
+      {subtitle && <div style={sub}>{subtitle}</div>}
     </div>
   )
 }

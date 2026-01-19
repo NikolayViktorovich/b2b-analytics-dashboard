@@ -76,7 +76,8 @@ const SourcesChart = ({ data }: Props) => {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
-    padding: '24px',
+    padding: '16px',
+    height: '816px',
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
@@ -84,7 +85,8 @@ const SourcesChart = ({ data }: Props) => {
   }
 
   const headerStyle: React.CSSProperties = {
-    marginBottom: '24px',
+    marginBottom: '16px',
+    flexShrink: 0,
   }
 
   const titleStyle: React.CSSProperties = {
@@ -102,9 +104,11 @@ const SourcesChart = ({ data }: Props) => {
   const chartWrap: React.CSSProperties = {
     position: 'relative',
     width: '100%',
-    height: '220px',
-    marginBottom: '24px',
+    flex: 1,
+    marginBottom: '16px',
     outline: 'none',
+    minHeight: '300px',
+    flexShrink: 0,
   }
 
   const centerTxt: React.CSSProperties = {
@@ -165,6 +169,8 @@ const SourcesChart = ({ data }: Props) => {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
+    flex: 1,
+    overflowY: 'auto',
   }
 
   const legendItem = (idx: number): React.CSSProperties => ({
@@ -210,7 +216,7 @@ const SourcesChart = ({ data }: Props) => {
               cx="50%"
               cy="50%"
               innerRadius={60}
-              outerRadius={80}
+              outerRadius={85}
               paddingAngle={3}
               dataKey="value"
               activeIndex={activeIdx ?? undefined}

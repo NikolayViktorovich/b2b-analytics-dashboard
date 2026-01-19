@@ -15,20 +15,30 @@ const ProductTable = ({ products }: Props) => {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
-    padding: '24px',
+    padding: '16px',
+    height: '400px',
+    display: 'flex',
+    flexDirection: 'column',
   }
 
   const headerStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: '20px',
+    marginBottom: '16px',
+    flexShrink: 0,
   }
 
   const titleStyle: React.CSSProperties = {
     fontSize: '16px',
     fontWeight: 600,
     color: 'var(--text-primary)',
+  }
+
+  const tableWrap: React.CSSProperties = {
+    flex: 1,
+    overflowY: 'auto',
+    overflowX: 'hidden',
   }
 
   const tableStyle: React.CSSProperties = {
@@ -58,28 +68,30 @@ const ProductTable = ({ products }: Props) => {
         <div style={titleStyle}>Самые продаваемые товары</div>
       </div>
 
-      <table style={tableStyle}>
-        <thead>
-          <tr>
-            <th style={thStyle}>Название товара</th>
-            <th style={thStyle}>Бренд</th>
-            <th style={thStyle}>Количество</th>
-            <th style={thStyle}>Цена</th>
-            <th style={thStyle}>Доход</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product, index) => (
-            <tr key={index}>
-              <td style={tdStyle}>{product.name}</td>
-              <td style={tdStyle}>{product.brand}</td>
-              <td style={tdStyle}>{product.quantity}</td>
-              <td style={tdStyle}>${product.price.toFixed(2)}</td>
-              <td style={tdStyle}>${product.earning.toFixed(2)}</td>
+      <div style={tableWrap}>
+        <table style={tableStyle}>
+          <thead>
+            <tr>
+              <th style={thStyle}>Название товара</th>
+              <th style={thStyle}>Бренд</th>
+              <th style={thStyle}>Количество</th>
+              <th style={thStyle}>Цена</th>
+              <th style={thStyle}>Доход</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {products.map((product, index) => (
+              <tr key={index}>
+                <td style={tdStyle}>{product.name}</td>
+                <td style={tdStyle}>{product.brand}</td>
+                <td style={tdStyle}>{product.quantity}</td>
+                <td style={tdStyle}>${product.price.toFixed(2)}</td>
+                <td style={tdStyle}>${product.earning.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
