@@ -5,64 +5,64 @@ interface P {
 const RFMSegments = ({ data }: P) => {
   const total = data.reduce((sum, item) => sum + item.count, 0)
 
-  const cardStyle: React.CSSProperties = {
+  const card = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
     padding: '16px',
     height: '400px',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
   }
 
-  const headerStyle: React.CSSProperties = {
+  const hdr = {
     marginBottom: '16px',
     flexShrink: 0,
   }
 
-  const titleStyle: React.CSSProperties = {
+  const title = {
     fontSize: '16px',
     fontWeight: 600,
     color: 'var(--text-primary)',
     marginBottom: '4px',
   }
 
-  const subtitleStyle: React.CSSProperties = {
+  const sub = {
     fontSize: '13px',
     color: 'var(--text-muted)',
   }
 
-  const listStyle: React.CSSProperties = {
+  const list = {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     gap: '16px',
     flex: 1,
-    overflowY: 'auto',
-    overflowX: 'hidden',
+    overflowY: 'auto' as const,
+    overflowX: 'hidden' as const,
   }
 
-  const itemStyle: React.CSSProperties = {
+  const item = {
     padding: '16px',
     background: 'var(--bg-secondary)',
     borderRadius: '12px',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     gap: '12px',
   }
 
-  const topStyle: React.CSSProperties = {
+  const top = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
   }
 
-  const leftStyle: React.CSSProperties = {
+  const left = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
   }
 
-  const dotStyle = (color: string): React.CSSProperties => ({
+  const dot = (color: string) => ({
     width: '12px',
     height: '12px',
     borderRadius: '50%',
@@ -70,77 +70,77 @@ const RFMSegments = ({ data }: P) => {
     boxShadow: `0 0 8px ${color}`,
   })
 
-  const nameStyle: React.CSSProperties = {
+  const name = {
     fontSize: '15px',
     fontWeight: 600,
     color: 'var(--text-primary)',
   }
 
-  const descStyle: React.CSSProperties = {
+  const desc = {
     fontSize: '12px',
     color: 'var(--text-muted)',
   }
 
-  const statsStyle: React.CSSProperties = {
+  const stats = {
     display: 'flex',
     gap: '16px',
   }
 
-  const statStyle: React.CSSProperties = {
+  const stat = {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     gap: '4px',
   }
 
-  const statLblStyle: React.CSSProperties = {
+  const lbl = {
     fontSize: '11px',
     color: 'var(--text-muted)',
-    textTransform: 'uppercase',
+    textTransform: 'uppercase' as const,
     letterSpacing: '0.5px',
   }
 
-  const statValStyle: React.CSSProperties = {
+  const val = {
     fontSize: '16px',
     fontWeight: 700,
     color: 'var(--text-primary)',
   }
 
-  const pctStyle: React.CSSProperties = {
+  const pct = {
     fontSize: '14px',
     fontWeight: 600,
     color: 'var(--text-secondary)',
   }
 
   return (
-    <div style={cardStyle}>
-      <div style={headerStyle}>
-        <div style={titleStyle}>RFM сегменты</div>
-        <div style={subtitleStyle}>Сегментация клиентов</div>
+    <div style={card}>
+      <div style={hdr}>
+        <div style={title}>RFM сегменты</div>
+        <div style={sub}>Сегментация клиентов</div>
       </div>
 
-      <div style={listStyle}>
+      <div style={list}>
         {data.map((seg, idx) => {
-          const pct = ((seg.count / total) * 100).toFixed(0)
+          const p = ((seg.count / total) * 100).toFixed(0)
           return (
-            <div key={idx} style={itemStyle}>
-              <div style={topStyle}>
-                <div style={leftStyle}>
-                  <div style={dotStyle(seg.color)} />
+            <div key={idx} style={item}>
+              <div style={top}>
+                <div style={left}>
+                  <div style={dot(seg.color)} />
                   <div>
-                    <div style={nameStyle}>{seg.segment}</div>
-                    <div style={descStyle}>{seg.desc}</div>
+                    <div style={name}>{seg.segment}</div>
+                    <div style={desc}>{seg.desc}</div>
                   </div>
                 </div>
-                <div style={pctStyle}>{pct}%</div>
+                <div style={pct}>{p}%</div>
               </div>
-              <div style={statsStyle}>
-                <div style={statStyle}>
-                  <span style={statLblStyle}>Клиенты</span>
-                  <span style={statValStyle}>{seg.count}</span>
+              <div style={stats}>
+                <div style={stat}>
+                  <span style={lbl}>Клиенты</span>
+                  <span style={val}>{seg.count}</span>
                 </div>
-                <div style={statStyle}>
-                  <span style={statLblStyle}>Доход</span>
-                  <span style={statValStyle}>${(seg.revenue / 1000).toFixed(0)}K</span>
+                <div style={stat}>
+                  <span style={lbl}>Доход</span>
+                  <span style={val}>${(seg.revenue / 1000).toFixed(0)}K</span>
                 </div>
               </div>
             </div>

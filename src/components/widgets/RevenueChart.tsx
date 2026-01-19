@@ -12,42 +12,42 @@ const RevenueChart = ({ data }: P) => {
   const range = max - min
   const totalVal = data.reduce((sum, d) => sum + d.value, 0)
 
-  const card: React.CSSProperties = {
+  const card = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
     padding: '16px',
     height: '400px',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
   }
 
-  const header: React.CSSProperties = {
+  const hdr = {
     marginBottom: '16px',
     flexShrink: 0,
   }
 
-  const title: React.CSSProperties = {
+  const title = {
     fontSize: '16px',
     fontWeight: 600,
     color: 'var(--text-primary)',
     marginBottom: '4px',
   }
 
-  const subtitle: React.CSSProperties = {
+  const sub = {
     fontSize: '13px',
     color: 'var(--text-muted)',
     marginBottom: '8px',
   }
 
-  const total: React.CSSProperties = {
+  const total = {
     fontSize: '28px',
     fontWeight: 700,
     color: 'var(--text-primary)',
     marginBottom: '4px',
   }
 
-  const change: React.CSSProperties = {
+  const chg = {
     fontSize: '13px',
     color: '#4ade80',
     display: 'inline-flex',
@@ -55,8 +55,8 @@ const RevenueChart = ({ data }: P) => {
     gap: '4px',
   }
 
-  const chartWrap: React.CSSProperties = {
-    position: 'relative',
+  const wrap = {
+    position: 'relative' as const,
     display: 'flex',
     alignItems: 'flex-end',
     gap: '6px',
@@ -64,22 +64,22 @@ const RevenueChart = ({ data }: P) => {
     flex: 1,
   }
 
-  const bar = (idx: number, val: number): React.CSSProperties => {
+  const bar = (idx: number, val: number) => {
     const h = ((val - min) / range) * 100
     const isHov = hovIdx === idx
     return {
       flex: 1,
       height: `${Math.max(h, 10)}%`,
-      background: isHov ? '#8b5cf6' : 'rgba(139, 92, 246, 0.5)',
+      background: isHov ? '#8b5cf6' : 'rgba(139,92,246,0.5)',
       borderRadius: '4px 4px 0 0',
       cursor: 'pointer',
       transition: 'all 0.15s',
-      position: 'relative',
+      position: 'relative' as const,
     }
   }
 
-  const tooltip: React.CSSProperties = {
-    position: 'absolute',
+  const tip = {
+    position: 'absolute' as const,
     bottom: '100%',
     left: '50%',
     transform: 'translateX(-50%)',
@@ -88,14 +88,14 @@ const RevenueChart = ({ data }: P) => {
     borderRadius: '8px',
     padding: '8px 12px',
     marginBottom: '8px',
-    whiteSpace: 'nowrap',
+    whiteSpace: 'nowrap' as const,
     fontSize: '12px',
-    pointerEvents: 'none',
+    pointerEvents: 'none' as const,
     zIndex: 10,
     boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
   }
 
-  const labels: React.CSSProperties = {
+  const lbls = {
     display: 'flex',
     justifyContent: 'space-between',
     marginTop: '12px',
@@ -106,16 +106,16 @@ const RevenueChart = ({ data }: P) => {
 
   return (
     <div style={card}>
-      <div style={header}>
+      <div style={hdr}>
         <div style={title}>Общий доход</div>
-        <div style={subtitle}>Последние 12 месяцев</div>
+        <div style={sub}>Последние 12 месяцев</div>
         <div style={total}>${(totalVal / 1000).toFixed(0)}k</div>
-        <div style={change}>
+        <div style={chg}>
           ↑ +12.5%
         </div>
       </div>
       
-      <div style={chartWrap}>
+      <div style={wrap}>
         {data.map((d, i) => (
           <div
             key={i}
@@ -124,11 +124,11 @@ const RevenueChart = ({ data }: P) => {
             onMouseLeave={() => setHovIdx(null)}
           >
             {hovIdx === i && (
-              <div style={tooltip}>
-                <div style={{ color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px' }}>
+              <div style={tip}>
+                <div style={{color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px'}}>
                   {d.month}
                 </div>
-                <div style={{ color: '#8b5cf6', fontWeight: 600, fontSize: '14px' }}>
+                <div style={{color: '#8b5cf6', fontWeight: 600, fontSize: '14px'}}>
                   ${(d.value / 1000).toFixed(1)}k
                 </div>
               </div>
@@ -137,7 +137,7 @@ const RevenueChart = ({ data }: P) => {
         ))}
       </div>
       
-      <div style={labels}>
+      <div style={lbls}>
         <span>{data[0]?.month}</span>
         <span>{data[Math.floor(data.length / 2)]?.month}</span>
         <span>{data[data.length - 1]?.month}</span>
