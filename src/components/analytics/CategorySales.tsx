@@ -1,124 +1,128 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { useState } from 'react'
 
-interface Props {
+interface P {
   data: { name: string; sales: number; orders: number; growth: number; color: string }[]
 }
 
-const CustomTooltip = ({ active, payload }: any) => {
-  if (!active || !payload || !payload.length) return null
+const CategorySales = ({ data }: P) => {
+  const [hovIdx, setHovIdx] = useState<number | null>(null)
+  
+  const maxSales = Math.max(...data.map(d => d.sales))
 
-  const data = payload[0].payload
-
-  const ttStyle: React.CSSProperties = {
-    background: 'var(--bg-card)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '12px',
-    padding: '12px 16px',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-  }
-
-  const nameStyle: React.CSSProperties = {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: 'var(--text-primary)',
-    marginBottom: '8px',
-  }
-
-  const rowStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: '16px',
-    fontSize: '12px',
-    marginBottom: '4px',
-  }
-
-  const lblStyle: React.CSSProperties = {
-    color: 'var(--text-muted)',
-  }
-
-  const valStyle: React.CSSProperties = {
-    fontWeight: 600,
-    color: 'var(--text-primary)',
-  }
-
-  return (
-    <div style={ttStyle}>
-      <div style={nameStyle}>{data.name}</div>
-      <div style={rowStyle}>
-        <span style={lblStyle}>Продажи:</span>
-        <span style={valStyle}>${(data.sales / 1000).toFixed(0)}K</span>
-      </div>
-      <div style={rowStyle}>
-        <span style={lblStyle}>Заказы:</span>
-        <span style={valStyle}>{data.orders}</span>
-      </div>
-      <div style={rowStyle}>
-        <span style={lblStyle}>Рост:</span>
-        <span style={{ ...valStyle, color: data.growth > 0 ? 'var(--accent-primary)' : 'var(--error)' }}>
-          {data.growth > 0 ? '+' : ''}{data.growth}%
-        </span>
-      </div>
-    </div>
-  )
-}
-
-const CategorySales = ({ data }: Props) => {
-  const cardStyle: React.CSSProperties = {
+  const card: React.CSSProperties = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
-    padding: '24px',
+    padding: '16px',
+    height: '400px',
+    display: 'flex',
+    flexDirection: 'column',
   }
 
-  const headerStyle: React.CSSProperties = {
-    marginBottom: '24px',
+  const header: React.CSSProperties = {
+    marginBottom: '16px',
+    flexShrink: 0,
   }
 
-  const titleStyle: React.CSSProperties = {
+  const title: React.CSSProperties = {
     fontSize: '16px',
     fontWeight: 600,
     color: 'var(--text-primary)',
     marginBottom: '4px',
   }
 
-  const subtitleStyle: React.CSSProperties = {
+  const subtitle: React.CSSProperties = {
     fontSize: '13px',
     color: 'var(--text-muted)',
   }
 
+  const chartWrap: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    flex: 1,
+    overflowY: 'auto',
+  }
+
+  const row = (idx: number): React.CSSProperties => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '12px',
+    background: hovIdx === idx ? 'var(--bg-secondary)' : 'transparent',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  })
+
+  const label: React.CSSProperties = {
+    fontSize: '13px',
+    fontWeight: 500,
+    color: 'var(--text-primary)',
+    minWidth: '100px',
+  }
+
+  const barWrap: React.CSSProperties = {
+    flex: 1,
+    height: '32px',
+    background: 'var(--bg-tertiary)',
+    borderRadius: '6px',
+    overflow: 'hidden',
+    position: 'relative',
+  }
+
+  const barFill = (sales: number, color: string, isHov: boolean): React.CSSProperties => ({
+    height: '100%',
+    width: `${(sales / maxSales) * 100}%`,
+    background: color,
+    opacity: isHov ? 1 : 0.8,
+    transition: 'all 0.2s',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingRight: '12px',
+  })
+
+  const value: React.CSSProperties = {
+    fontSize: '12px',
+    fontWeight: 600,
+    color: 'var(--bg-primary)',
+  }
+
+  const growth = (g: number): React.CSSProperties => ({
+    fontSize: '12px',
+    fontWeight: 600,
+    color: g > 0 ? '#4ade80' : '#f87171',
+    minWidth: '50px',
+    textAlign: 'right',
+  })
+
   return (
-    <div style={cardStyle}>
-      <div style={headerStyle}>
-        <div style={titleStyle}>Продажи по категориям</div>
-        <div style={subtitleStyle}>Топ категорий товаров</div>
+    <div style={card}>
+      <div style={header}>
+        <div style={title}>Продажи по категориям</div>
+        <div style={subtitle}>Топ 5 категорий товаров</div>
       </div>
 
-      <div style={{ width: '100%', height: '300px' }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
-            <XAxis
-              dataKey="name"
-              stroke="var(--text-muted)"
-              style={{ fontSize: '12px' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              stroke="var(--text-muted)"
-              style={{ fontSize: '12px' }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(196, 255, 97, 0.1)' }} />
-            <Bar dataKey="sales" radius={[8, 8, 0, 0]}>
-              {data.map((entry, idx) => (
-                <Cell key={`cell-${idx}`} fill={entry.color} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+      <div style={chartWrap}>
+        {data.map((d, i) => (
+          <div
+            key={i}
+            style={row(i)}
+            onMouseEnter={() => setHovIdx(i)}
+            onMouseLeave={() => setHovIdx(null)}
+          >
+            <div style={label}>{d.name}</div>
+            <div style={barWrap}>
+              <div style={barFill(d.sales, d.color, hovIdx === i)}>
+                <span style={value}>${(d.sales / 1000).toFixed(0)}k</span>
+              </div>
+            </div>
+            <div style={growth(d.growth)}>
+              {d.growth > 0 ? '+' : ''}{d.growth}%
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
