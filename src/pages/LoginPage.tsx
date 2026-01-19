@@ -16,139 +16,145 @@ const LoginPage = () => {
     try {
       await login(email, pwd)
     } catch (error) {
-      setErr('Ошибка авторизации')
+      setErr('Неверный email или пароль')
     } finally {
       setLoading(false)
     }
   }
 
-  const container = {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-    background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)',
-  }
-
-  const card = {
-    background: 'var(--bg-card)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '20px',
-    padding: '48px',
-    width: '100%',
-    maxWidth: '420px',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-  }
-
-  const title = {
-    fontSize: '32px',
-    fontWeight: 700,
-    textAlign: 'center' as const,
-    marginBottom: '8px',
-    background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-dark) 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-  }
-
-  const subtitle = {
-    color: 'var(--text-muted)',
-    textAlign: 'center' as const,
-    marginBottom: '32px',
-    fontSize: '15px',
-  }
-
-  const form = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '20px',
-  }
-
-  const field = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '8px',
-  }
-
-  const label = {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: 'var(--text-secondary)',
-  }
-
-  const input = {
-    background: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '10px',
-    padding: '12px 16px',
-    color: 'var(--text-primary)',
-    fontSize: '15px',
-    transition: 'border-color 0.2s',
-  }
-
-  const btn = {
-    background: 'var(--accent-primary)',
-    color: 'var(--bg-primary)',
-    padding: '14px',
-    borderRadius: '10px',
-    fontSize: '15px',
-    fontWeight: 700,
-    marginTop: '8px',
-    opacity: loading ? 0.6 : 1,
-    cursor: loading ? 'not-allowed' : 'pointer',
-    transition: 'all 0.2s',
-  }
-
-  const error = {
-    background: 'rgba(255,87,87,0.15)',
-    border: '1px solid var(--error)',
-    color: 'var(--error)',
-    padding: '12px',
-    borderRadius: '10px',
-    fontSize: '14px',
-    textAlign: 'center' as const,
-  }
-
   return (
-    <div style={container}>
-      <div style={card}>
-        <h1 style={title}>Reddix</h1>
-        <p style={subtitle}>Войдите в систему</p>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'var(--bg-primary)',
+      padding: '20px',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '380px',
+      }}>
+        <div style={{
+          marginBottom: '40px',
+          textAlign: 'center',
+        }}>
+          <h1 style={{
+            fontSize: '48px',
+            fontWeight: 800,
+            color: 'var(--accent-primary)',
+            marginBottom: '8px',
+            letterSpacing: '-1px',
+          }}>
+            Reddix
+          </h1>
+          <p style={{
+            color: 'var(--text-muted)',
+            fontSize: '14px',
+          }}>
+            Панель аналитики
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} style={form}>
-          <div style={field}>
-            <label htmlFor="email" style={label}>Email</label>
+        <form onSubmit={handleSubmit} style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}>
+          <div>
             <input
-              id="email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="admin@example.com"
-              style={input}
+              placeholder="Email"
+              style={{
+                width: '100%',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                padding: '14px 16px',
+                color: 'var(--text-primary)',
+                fontSize: '15px',
+                outline: 'none',
+                transition: 'border 0.2s',
+              }}
+              onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
+              onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
               required
             />
           </div>
 
-          <div style={field}>
-            <label htmlFor="pwd" style={label}>Пароль</label>
+          <div>
             <input
-              id="pwd"
               type="password"
               value={pwd}
               onChange={e => setPwd(e.target.value)}
-              placeholder="••••••••"
-              style={input}
+              placeholder="Пароль"
+              style={{
+                width: '100%',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                padding: '14px 16px',
+                color: 'var(--text-primary)',
+                fontSize: '15px',
+                outline: 'none',
+                transition: 'border 0.2s',
+              }}
+              onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
+              onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
               required
             />
           </div>
 
-          {err && <div style={error}>{err}</div>}
+          {err && (
+            <div style={{
+              background: 'rgba(255,87,87,0.1)',
+              border: '1px solid rgba(255,87,87,0.3)',
+              color: 'var(--error)',
+              padding: '12px',
+              borderRadius: '8px',
+              fontSize: '14px',
+            }}>
+              {err}
+            </div>
+          )}
 
-          <button type="submit" style={btn} disabled={loading}>
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={{
+              background: 'var(--accent-primary)',
+              color: 'var(--bg-primary)',
+              padding: '14px',
+              borderRadius: '8px',
+              fontSize: '15px',
+              fontWeight: 600,
+              border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.7 : 1,
+              transition: 'opacity 0.2s',
+            }}
+          >
             {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>
+
+        <div style={{
+          marginTop: '24px',
+          padding: '16px',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '8px',
+          fontSize: '13px',
+          color: 'var(--text-muted)',
+        }}>
+          <div style={{marginBottom: '8px', fontWeight: 500, color: 'var(--text-secondary)'}}>
+            Тестовый доступ:
+          </div>
+          <div>Email: admin@reddix.com</div>
+          <div>Пароль: admin123</div>
+        </div>
       </div>
     </div>
   )
