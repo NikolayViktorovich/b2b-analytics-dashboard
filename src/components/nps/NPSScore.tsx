@@ -17,17 +17,18 @@ const NPSScore = ({ data }: Props) => {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
-    padding: '32px',
+    padding: '16px',
+    height: '400px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
+    gap: '16px',
   }
 
   const mainStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: '24px',
+    gap: '16px',
   }
 
   const leftStyle: React.CSSProperties = {
@@ -37,7 +38,7 @@ const NPSScore = ({ data }: Props) => {
   const labelStyle: React.CSSProperties = {
     fontSize: '14px',
     color: 'var(--text-muted)',
-    marginBottom: '12px',
+    marginBottom: '8px',
     fontWeight: 500,
   }
 
@@ -46,7 +47,7 @@ const NPSScore = ({ data }: Props) => {
     fontWeight: 800,
     color: 'var(--accent-primary)',
     lineHeight: 1,
-    marginBottom: '12px',
+    marginBottom: '8px',
   }
 
   const changeStyle: React.CSSProperties = {
