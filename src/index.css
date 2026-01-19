@@ -73,7 +73,6 @@ a {
   background: var(--border-color);
 }
 
-/* Адаптивность для мобильных */
 @media (max-width: 1024px) {
   :root {
     font-size: 15px;
@@ -85,7 +84,6 @@ a {
     font-size: 14px;
   }
   
-  /* Скрываем sidebar на мобильных */
   aside {
     position: fixed;
     left: -100%;
