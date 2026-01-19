@@ -2,9 +2,21 @@ import { useState } from 'react'
 import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
 import MainDashboard from '@/components/dashboard/MainDashboard'
+import NPSPage from './NPSPage'
 
 const DashboardPage = () => {
   const [currView, setCurrView] = useState('desktop')
+
+  const renderContent = () => {
+    switch (currView) {
+      case 'desktop':
+        return <MainDashboard />
+      case 'nps':
+        return <NPSPage />
+      default:
+        return <MainDashboard />
+    }
+  }
 
   const containerStyle: React.CSSProperties = {
     display: 'flex',
@@ -31,7 +43,7 @@ const DashboardPage = () => {
       <div style={mainStyle}>
         <Header />
         <div style={contentStyle}>
-          <MainDashboard />
+          {renderContent()}
         </div>
       </div>
     </div>

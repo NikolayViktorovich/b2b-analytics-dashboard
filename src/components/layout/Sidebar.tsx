@@ -21,11 +21,6 @@ const menuItems: MenuItem[] = [
     icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="12" width="3" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="8.5" y="8" width="3" height="9" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="14" y="4" width="3" height="13" rx="1" stroke="currentColor" strokeWidth="1.5"/></svg>
   },
   { 
-    id: 'mobile', 
-    label: 'Мобильное приложение',
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="5" y="2" width="10" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M9 15h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-  },
-  { 
     id: 'website', 
     label: 'Веб-сайт',
     icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5"/><path d="M3 10h14M10 3c-2 2.5-2 7.5 0 14m0-14c2 2.5 2 7.5 0 14" stroke="currentColor" strokeWidth="1.5"/></svg>
