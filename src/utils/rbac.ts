@@ -1,6 +1,6 @@
 import type { UserRole, Permission } from '@/types'
 
-const rolePermissions: Record<UserRole, Permission[]> = {
+const perms: Record<UserRole, Permission[]> = {
   admin: [
     'dashboard:view',
     'dashboard:edit',
@@ -27,7 +27,7 @@ const rolePermissions: Record<UserRole, Permission[]> = {
 }
 
 export const hasPermission = (role: UserRole, permission: Permission): boolean => {
-  return rolePermissions[role]?.includes(permission) ?? false
+  return perms[role]?.includes(permission) ?? false
 }
 
 export const hasAnyPermission = (role: UserRole, permissions: Permission[]): boolean => {

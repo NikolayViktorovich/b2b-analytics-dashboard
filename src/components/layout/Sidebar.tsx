@@ -16,8 +16,8 @@ const menuItems: MenuItem[] = [
     icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/></svg>
   },
   { 
-    id: 'club-stats', 
-    label: 'Статистика клуба',
+    id: 'analytics', 
+    label: 'Аналитика',
     icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="12" width="3" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="8.5" y="8" width="3" height="9" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="14" y="4" width="3" height="13" rx="1" stroke="currentColor" strokeWidth="1.5"/></svg>
   },
   { 
@@ -71,7 +71,7 @@ const Sidebar = ({ currView, onViewChange }: Props) => {
     cursor: 'pointer',
   }
 
-  const itemActiveStyle: React.CSSProperties = {
+  const itemActive: React.CSSProperties = {
     ...itemStyle,
     background: 'var(--accent-primary)',
     color: 'var(--bg-primary)',
@@ -102,7 +102,7 @@ const Sidebar = ({ currView, onViewChange }: Props) => {
         {menuItems.map(item => (
           <button
             key={item.id}
-            style={currView === item.id ? itemActiveStyle : itemStyle}
+            style={currView === item.id ? itemActive : itemStyle}
             onClick={() => onViewChange(item.id)}
             onMouseEnter={(e) => {
               const tt = e.currentTarget.querySelector('.tooltip') as HTMLElement

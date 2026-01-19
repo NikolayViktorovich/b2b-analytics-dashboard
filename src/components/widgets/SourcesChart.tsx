@@ -66,7 +66,7 @@ const SourcesChart = ({ data }: Props) => {
     }
   }
 
-  const handleChartLeave = () => {
+  const onChartLeave = () => {
     setActiveIdx(null)
     setTtData(null)
     setClicked(false)
@@ -99,7 +99,7 @@ const SourcesChart = ({ data }: Props) => {
     color: 'var(--text-muted)',
   }
 
-  const chartContainerStyle: React.CSSProperties = {
+  const chartWrap: React.CSSProperties = {
     position: 'relative',
     width: '100%',
     height: '220px',
@@ -107,7 +107,7 @@ const SourcesChart = ({ data }: Props) => {
     outline: 'none',
   }
 
-  const centerTextStyle: React.CSSProperties = {
+  const centerTxt: React.CSSProperties = {
     position: 'absolute',
     top: '50%',
     left: '50%',
@@ -116,13 +116,13 @@ const SourcesChart = ({ data }: Props) => {
     pointerEvents: 'none',
   }
 
-  const centerValueStyle: React.CSSProperties = {
+  const centerVal: React.CSSProperties = {
     fontSize: '28px',
     fontWeight: 700,
     color: 'var(--text-primary)',
   }
 
-  const centerLabelStyle: React.CSSProperties = {
+  const centerLbl: React.CSSProperties = {
     fontSize: '12px',
     color: 'var(--text-muted)',
     marginTop: '4px',
@@ -142,20 +142,20 @@ const SourcesChart = ({ data }: Props) => {
     animation: 'slideIn 0.3s ease-out',
   }
 
-  const tooltipNameStyle: React.CSSProperties = {
+  const ttName: React.CSSProperties = {
     fontSize: '12px',
     color: 'var(--text-muted)',
     marginBottom: '4px',
   }
 
-  const tooltipValueStyle: React.CSSProperties = {
+  const ttVal: React.CSSProperties = {
     fontSize: '20px',
     fontWeight: 700,
     color: 'var(--text-primary)',
     marginBottom: '4px',
   }
 
-  const tooltipPercentageStyle: React.CSSProperties = {
+  const ttPct: React.CSSProperties = {
     fontSize: '14px',
     fontWeight: 600,
     color: ttData?.color || 'var(--text-primary)',
@@ -167,7 +167,7 @@ const SourcesChart = ({ data }: Props) => {
     gap: '12px',
   }
 
-  const legendItemStyle = (idx: number): React.CSSProperties => ({
+  const legendItem = (idx: number): React.CSSProperties => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -181,7 +181,7 @@ const SourcesChart = ({ data }: Props) => {
     width: '100%',
   })
 
-  const legendLabelStyle: React.CSSProperties = {
+  const legendLbl: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
@@ -189,7 +189,7 @@ const SourcesChart = ({ data }: Props) => {
     color: 'var(--text-secondary)',
   }
 
-  const legendValueStyle: React.CSSProperties = {
+  const legendVal: React.CSSProperties = {
     fontSize: '16px',
     fontWeight: 600,
     color: 'var(--text-primary)',
@@ -202,7 +202,7 @@ const SourcesChart = ({ data }: Props) => {
         <div style={subtitleStyle}>Продажи за эту неделю</div>
       </div>
 
-      <div style={chartContainerStyle} onMouseLeave={handleChartLeave}>
+      <div style={chartWrap} onMouseLeave={onChartLeave}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -236,16 +236,16 @@ const SourcesChart = ({ data }: Props) => {
           </PieChart>
         </ResponsiveContainer>
         
-        <div style={centerTextStyle}>
-          <div style={centerValueStyle}>${(total * 15.5).toFixed(0)}</div>
-          <div style={centerLabelStyle}>Всего продаж</div>
+        <div style={centerTxt}>
+          <div style={centerVal}>${(total * 15.5).toFixed(0)}</div>
+          <div style={centerLbl}>Всего продаж</div>
         </div>
 
         {ttData && (
           <div style={tooltipStyle}>
-            <div style={tooltipNameStyle}>{ttData.name}</div>
-            <div style={tooltipValueStyle}>{ttData.value}</div>
-            <div style={tooltipPercentageStyle}>{ttData.percentage}%</div>
+            <div style={ttName}>{ttData.name}</div>
+            <div style={ttVal}>{ttData.value}</div>
+            <div style={ttPct}>{ttData.percentage}%</div>
           </div>
         )}
       </div>
@@ -255,7 +255,7 @@ const SourcesChart = ({ data }: Props) => {
           return (
             <button
               key={idx} 
-              style={legendItemStyle(idx)}
+              style={legendItem(idx)}
               onMouseEnter={() => {
                 if (!clicked) setActiveIdx(idx)
               }}
@@ -265,7 +265,7 @@ const SourcesChart = ({ data }: Props) => {
               onClick={() => handleClick(null, idx)}
               onFocus={(e) => e.currentTarget.style.outline = 'none'}
             >
-              <div style={legendLabelStyle}>
+              <div style={legendLbl}>
                 <div style={{ 
                   width: '10px', 
                   height: '10px', 
@@ -276,7 +276,7 @@ const SourcesChart = ({ data }: Props) => {
                 }} />
                 <span>{item.name}</span>
               </div>
-              <div style={legendValueStyle}>{item.value}</div>
+              <div style={legendVal}>{item.value}</div>
             </button>
           )
         })}

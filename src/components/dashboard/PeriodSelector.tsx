@@ -117,7 +117,7 @@ const PeriodSelector = ({ value, onChange }: Props) => {
     flexWrap: 'wrap',
   }
 
-  const btnPrimaryStyle: React.CSSProperties = {
+  const btnPrim: React.CSSProperties = {
     background: 'var(--accent-primary)',
     color: 'var(--bg-primary)',
     padding: '10px 20px',
@@ -127,7 +127,7 @@ const PeriodSelector = ({ value, onChange }: Props) => {
     transition: 'all 0.2s',
   }
 
-  const btnSecondaryStyle: React.CSSProperties = {
+  const btnSec: React.CSSProperties = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     color: 'var(--text-secondary)',
@@ -172,7 +172,7 @@ const PeriodSelector = ({ value, onChange }: Props) => {
         <div style={actionsStyle}>
           <button 
             ref={presetsBtnRef}
-            style={btnSecondaryStyle}
+            style={btnSec}
             onClick={() => setShowPresets(!showPresets)}
             title="Быстрый выбор периода"
           >
@@ -180,8 +180,8 @@ const PeriodSelector = ({ value, onChange }: Props) => {
               <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
             </svg>
           </button>
-          <button style={btnPrimaryStyle}>Применить</button>
-          <button style={btnSecondaryStyle} onClick={handleReset}>Сбросить</button>
+          <button style={btnPrim}>Применить</button>
+          <button style={btnSec} onClick={handleReset}>Сбросить</button>
         </div>
       </div>
 
@@ -253,7 +253,7 @@ const PresetsMenu = ({ anchorEl, onSelect, onClose }: PresetsMenuProps) => {
   }, [anchorEl])
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const onClickOut = (event: MouseEvent) => {
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target as Node) &&
@@ -270,11 +270,11 @@ const PresetsMenu = ({ anchorEl, onSelect, onClose }: PresetsMenuProps) => {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', onClickOut)
     document.addEventListener('keydown', handleEscape)
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('mousedown', onClickOut)
       document.removeEventListener('keydown', handleEscape)
     }
   }, [onClose, anchorEl])
@@ -347,7 +347,7 @@ const PresetsMenu = ({ anchorEl, onSelect, onClose }: PresetsMenuProps) => {
     textAlign: 'left',
   }
 
-  const iconWrapperStyle: React.CSSProperties = {
+  const iconWrap: React.CSSProperties = {
     width: '20px',
     height: '20px',
     display: 'flex',
@@ -376,7 +376,7 @@ const PresetsMenu = ({ anchorEl, onSelect, onClose }: PresetsMenuProps) => {
               if (icon) icon.style.color = 'var(--text-secondary)'
             }}
           >
-            <span className="icon-wrapper" style={iconWrapperStyle}>{preset.icon}</span>
+            <span className="icon-wrapper" style={iconWrap}>{preset.icon}</span>
             <span>{preset.label}</span>
           </button>
         ))}

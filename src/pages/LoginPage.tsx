@@ -112,15 +112,6 @@ const LoginPage = () => {
     textAlign: 'center',
   }
 
-  const hintStyle: React.CSSProperties = {
-    marginTop: '24px',
-    paddingTop: '24px',
-    borderTop: '1px solid var(--border-color)',
-    textAlign: 'center',
-    fontSize: '13px',
-    color: 'var(--text-muted)',
-  }
-
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
@@ -160,9 +151,6 @@ const LoginPage = () => {
             {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>
-
-        <div style={hintStyle}>
-        </div>
       </div>
     </div>
   )

@@ -35,7 +35,7 @@ const Calendar = ({ value, onChange, onClose, anchorEl }: Props) => {
   }, [anchorEl])
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const onClickOut = (event: MouseEvent) => {
       if (
         calendarRef.current &&
         !calendarRef.current.contains(event.target as Node) &&
@@ -52,11 +52,11 @@ const Calendar = ({ value, onChange, onClose, anchorEl }: Props) => {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', onClickOut)
     document.addEventListener('keydown', handleEscape)
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('mousedown', onClickOut)
       document.removeEventListener('keydown', handleEscape)
     }
   }, [onClose, anchorEl])
@@ -203,7 +203,7 @@ const Calendar = ({ value, onChange, onClose, anchorEl }: Props) => {
     cursor: 'default',
   }
 
-  const selectedDayStyle: React.CSSProperties = {
+  const selDay: React.CSSProperties = {
     ...dayStyle,
     background: 'var(--accent-primary)',
     color: 'var(--bg-primary)',
@@ -253,7 +253,7 @@ const Calendar = ({ value, onChange, onClose, anchorEl }: Props) => {
             const now = isNow(day)
             
             let style = dayStyle
-            if (sel) style = selectedDayStyle
+            if (sel) style = selDay
             else if (now) style = todayStyle
 
             return (
