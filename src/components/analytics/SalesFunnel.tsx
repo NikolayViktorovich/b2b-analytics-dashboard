@@ -1,9 +1,13 @@
+import { useState } from 'react'
+
 interface P {
   data: { stage: string; value: number; percent: number; color: string }[]
 }
 
 const SalesFunnel = ({ data }: P) => {
-  const cardStyle: React.CSSProperties = {
+  const [hovIdx, setHovIdx] = useState<number | null>(null)
+
+  const card: React.CSSProperties = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
@@ -13,141 +17,138 @@ const SalesFunnel = ({ data }: P) => {
     flexDirection: 'column',
   }
 
-  const headerStyle: React.CSSProperties = {
+  const header: React.CSSProperties = {
     marginBottom: '16px',
     flexShrink: 0,
   }
 
-  const titleStyle: React.CSSProperties = {
+  const title: React.CSSProperties = {
     fontSize: '16px',
     fontWeight: 600,
     color: 'var(--text-primary)',
     marginBottom: '4px',
   }
 
-  const subtitleStyle: React.CSSProperties = {
+  const subtitle: React.CSSProperties = {
     fontSize: '13px',
     color: 'var(--text-muted)',
   }
 
-  const funnelWrap: React.CSSProperties = {
-    flex: 1,
-    overflowY: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-  }
-
-  const funnelStyle: React.CSSProperties = {
+  const chartWrap: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
+    flex: 1,
+    overflowY: 'auto',
   }
 
-  const stageStyle: React.CSSProperties = {
+  const row = (idx: number): React.CSSProperties => ({
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
-  }
+    padding: '12px',
+    background: hovIdx === idx ? 'var(--bg-secondary)' : 'transparent',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  })
 
-  const topStyle: React.CSSProperties = {
+  const top: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
   }
 
-  const lblStyle: React.CSSProperties = {
-    fontSize: '14px',
+  const label: React.CSSProperties = {
+    fontSize: '13px',
     fontWeight: 500,
     color: 'var(--text-primary)',
   }
 
-  const valStyle: React.CSSProperties = {
-    fontSize: '16px',
-    fontWeight: 700,
+  const value: React.CSSProperties = {
+    fontSize: '14px',
+    fontWeight: 600,
     color: 'var(--text-primary)',
   }
 
   const barWrap: React.CSSProperties = {
-    position: 'relative',
-    width: '100%',
-    height: '48px',
-    background: 'var(--bg-secondary)',
-    borderRadius: '8px',
+    height: '32px',
+    background: 'var(--bg-tertiary)',
+    borderRadius: '6px',
     overflow: 'hidden',
+    position: 'relative',
   }
 
-  const barStyle = (percent: number, color: string): React.CSSProperties => ({
-    position: 'absolute',
-    left: 0,
-    top: 0,
+  const barFill = (percent: number, color: string, isHov: boolean): React.CSSProperties => ({
     height: '100%',
-    width: `${percent}%`,
+    width: `${Math.max(percent, 15)}%`,
     background: color,
-    borderRadius: '8px',
+    opacity: isHov ? 1 : 0.8,
+    transition: 'all 0.2s',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    padding: '0 16px',
-    transition: 'width 0.3s ease',
+    paddingRight: '12px',
   })
 
-  const pctStyle: React.CSSProperties = {
-    fontSize: '14px',
-    fontWeight: 700,
+  const pct: React.CSSProperties = {
+    fontSize: '12px',
+    fontWeight: 600,
     color: 'var(--bg-primary)',
   }
 
-  const conversionStyle: React.CSSProperties = {
-    marginTop: '16px',
-    padding: '16px',
+  const conv: React.CSSProperties = {
+    marginTop: '8px',
+    padding: '12px',
     background: 'var(--bg-secondary)',
-    borderRadius: '12px',
+    borderRadius: '8px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     flexShrink: 0,
   }
 
-  const convLblStyle: React.CSSProperties = {
-    fontSize: '14px',
-    color: 'var(--text-secondary)',
+  const convLabel: React.CSSProperties = {
+    fontSize: '13px',
+    color: 'var(--text-muted)',
   }
 
-  const convValStyle: React.CSSProperties = {
-    fontSize: '24px',
-    fontWeight: 700,
+  const convValue: React.CSSProperties = {
+    fontSize: '18px',
+    fontWeight: 600,
     color: 'var(--accent-primary)',
   }
 
-  const finalConversion = data[data.length - 1].percent
-
   return (
-    <div style={cardStyle}>
-      <div style={headerStyle}>
-        <div style={titleStyle}>Воронка продаж</div>
-        <div style={subtitleStyle}>От просмотра до покупки</div>
+    <div style={card}>
+      <div style={header}>
+        <div style={title}>Воронка продаж</div>
+        <div style={subtitle}>От просмотра до покупки</div>
       </div>
 
-      <div style={funnelWrap}>
-        <div style={funnelStyle}>
-          {data.map((stage, idx) => (
-            <div key={idx} style={stageStyle}>
-              <div style={topStyle}>
-                <span style={lblStyle}>{stage.stage}</span>
-                <span style={valStyle}>{stage.value.toLocaleString()}</span>
-              </div>
-              <div style={barWrap}>
-                <div style={barStyle(stage.percent, stage.color)}>
-                  <span style={pctStyle}>{stage.percent}%</span>
-                </div>
+      <div style={chartWrap}>
+        {data.map((d, i) => (
+          <div
+            key={i}
+            style={row(i)}
+            onMouseEnter={() => setHovIdx(i)}
+            onMouseLeave={() => setHovIdx(null)}
+          >
+            <div style={top}>
+              <span style={label}>{d.stage}</span>
+              <span style={value}>{d.value.toLocaleString()}</span>
+            </div>
+            <div style={barWrap}>
+              <div style={barFill(d.percent, d.color, hovIdx === i)}>
+                <span style={pct}>{d.percent}%</span>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
 
-        <div style={conversionStyle}>
-          <span style={convLblStyle}>Общая конверсия</span>
-          <span style={convValStyle}>{finalConversion}%</span>
+        <div style={conv}>
+          <span style={convLabel}>Общая конверсия</span>
+          <span style={convValue}>{data[data.length - 1].percent}%</span>
         </div>
       </div>
     </div>
