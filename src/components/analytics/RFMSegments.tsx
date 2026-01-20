@@ -67,7 +67,6 @@ const RFMSegments = ({ data }: P) => {
     height: '12px',
     borderRadius: '50%',
     background: color,
-    boxShadow: `0 0 8px ${color}`,
   })
 
   const name = {
