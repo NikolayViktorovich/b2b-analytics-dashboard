@@ -1,3 +1,7 @@
+import { useState, useEffect } from 'react'
+import { useAuthStore } from '@/store/authStore'
+import { LayoutDashboard, UserCog, ClipboardList, TrendingUp, Globe, Star, Settings } from 'lucide-react'
+
 interface Props {
   currView: string
   onViewChange: (view: string) => void
@@ -7,126 +11,321 @@ interface MenuItem {
   id: string
   label: string
   icon: JSX.Element
+  requiredRole?: 'admin' | 'manager'
 }
 
 const menuItems: MenuItem[] = [
   { 
     id: 'desktop', 
     label: 'Рабочий стол',
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/></svg>
+    icon: <LayoutDashboard size={20} />
+  },
+  { 
+    id: 'admin', 
+    label: 'Админ панель',
+    icon: <UserCog size={20} />,
+    requiredRole: 'admin'
+  },
+  { 
+    id: 'manager', 
+    label: 'Менеджер панель',
+    icon: <ClipboardList size={20} />,
+    requiredRole: 'manager'
   },
   { 
     id: 'analytics', 
     label: 'Аналитика',
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="12" width="3" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="8.5" y="8" width="3" height="9" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="14" y="4" width="3" height="13" rx="1" stroke="currentColor" strokeWidth="1.5"/></svg>
+    icon: <TrendingUp size={20} />
   },
   { 
     id: 'website', 
     label: 'Веб-сайт',
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5"/><path d="M3 10h14M10 3c-2 2.5-2 7.5 0 14m0-14c2 2.5 2 7.5 0 14" stroke="currentColor" strokeWidth="1.5"/></svg>
+    icon: <Globe size={20} />
   },
   { 
     id: 'nps', 
     label: 'NPS опросы',
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2.5 5 5.5.5-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-.5L10 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+    icon: <Star size={20} />
   },
   { 
     id: 'settings', 
     label: 'Настройки',
-    icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/></svg>
+    icon: <Settings size={20} />
   },
 ]
 
 const Sidebar = ({ currView, onViewChange }: Props) => {
-  const sidebar: React.CSSProperties = {
-    width: '72px',
-    background: 'var(--bg-secondary)',
-    borderRight: '1px solid var(--border-color)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '24px 0',
-    gap: '8px',
-  }
+  const [isMobile, setIsMobile] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const { user } = useAuthStore()
 
-  const nav: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    width: '100%',
-    padding: '0 12px',
-  }
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
-  const item: React.CSSProperties = {
-    width: '48px',
-    height: '48px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'transparent',
-    color: 'var(--text-secondary)',
-    borderRadius: '12px',
-    transition: 'none',
-    position: 'relative',
-    cursor: 'pointer',
-  }
+  const visibleItems = menuItems.filter(item => {
+    if (!item.requiredRole) return true
+    if (item.requiredRole === 'admin') return user?.role === 'admin'
+    if (item.requiredRole === 'manager') return user?.role === 'admin' || user?.role === 'manager'
+    return true
+  })
 
-  const active: React.CSSProperties = {
-    ...item,
-    background: 'var(--accent-primary)',
-    color: 'var(--bg-primary)',
-  }
-
-  const tooltip: React.CSSProperties = {
-    position: 'absolute',
-    left: '64px',
-    background: 'var(--bg-card)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '8px',
-    padding: '8px 12px',
-    whiteSpace: 'nowrap',
-    fontSize: '13px',
-    fontWeight: 500,
-    color: 'var(--text-primary)',
-    pointerEvents: 'none',
-    opacity: 0,
-    transform: 'translateX(-10px)',
-    transition: 'all 0.2s',
-    zIndex: 1000,
-    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+  if (!isMobile) {
+    return (
+      <aside style={{
+        width: '72px',
+        background: 'var(--bg-secondary)',
+        borderRight: '1px solid var(--border-color)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '24px 0',
+        gap: '8px',
+      }}>
+        <nav style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          width: '100%',
+          padding: '0 12px',
+        }}>
+          {visibleItems.map(menuItem => (
+            <button
+              key={menuItem.id}
+              style={{
+                width: '48px',
+                height: '48px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: currView === menuItem.id ? 'var(--accent-primary)' : 'transparent',
+                color: currView === menuItem.id ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                borderRadius: '12px',
+                transition: 'all 0.2s',
+                position: 'relative',
+                cursor: 'pointer',
+                border: 'none',
+              }}
+              onClick={() => onViewChange(menuItem.id)}
+              onMouseEnter={e => {
+                const tt = e.currentTarget.querySelector('.tooltip') as HTMLElement
+                if(tt) {
+                  tt.style.opacity = '1'
+                  tt.style.transform = 'translateX(0)'
+                }
+              }}
+              onMouseLeave={e => {
+                const tt = e.currentTarget.querySelector('.tooltip') as HTMLElement
+                if(tt) {
+                  tt.style.opacity = '0'
+                  tt.style.transform = 'translateX(-10px)'
+                }
+              }}
+            >
+              {menuItem.icon}
+              <span className="tooltip" style={{
+                position: 'absolute',
+                left: '64px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                whiteSpace: 'nowrap',
+                fontSize: '13px',
+                fontWeight: 500,
+                color: 'var(--text-primary)',
+                pointerEvents: 'none',
+                opacity: 0,
+                transform: 'translateX(-10px)',
+                transition: 'all 0.2s',
+                zIndex: 1000,
+              }}>
+                {menuItem.label}
+              </span>
+            </button>
+          ))}
+        </nav>
+      </aside>
+    )
   }
 
   return (
-    <aside style={sidebar}>
-      <nav style={nav}>
-        {menuItems.map(menuItem => (
-          <button
-            key={menuItem.id}
-            style={currView === menuItem.id ? active : item}
-            onClick={() => onViewChange(menuItem.id)}
-            onMouseEnter={e => {
-              const tt = e.currentTarget.querySelector('.tooltip') as HTMLElement
-              if(tt) {
-                tt.style.opacity = '1'
-                tt.style.transform = 'translateX(0)'
-              }
-            }}
-            onMouseLeave={e => {
-              const tt = e.currentTarget.querySelector('.tooltip') as HTMLElement
-              if(tt) {
-                tt.style.opacity = '0'
-                tt.style.transform = 'translateX(-10px)'
-              }
-            }}
-          >
-            {menuItem.icon}
-            <span className="tooltip" style={tooltip}>
-              {menuItem.label}
-            </span>
-          </button>
-        ))}
+    <>
+      <div 
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: expanded ? '100vh' : '0',
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 998,
+          opacity: expanded ? 1 : 0,
+          transition: 'opacity 0.3s ease',
+          pointerEvents: expanded ? 'auto' : 'none',
+        }}
+        onClick={() => setExpanded(false)}
+      />
+      
+      <nav style={{
+        position: 'fixed',
+        bottom: '16px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'calc(100% - 32px)',
+        maxWidth: '420px',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '24px',
+        padding: '12px',
+        zIndex: 999,
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+        }}>
+          {visibleItems.slice(0, 4).map((menuItem) => {
+            const isActive = currView === menuItem.id
+            return (
+              <button
+                key={menuItem.id}
+                style={{
+                  flex: 1,
+                  height: '52px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  background: isActive ? 'var(--accent-primary)' : 'transparent',
+                  color: isActive ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                  border: 'none',
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  fontSize: '9px',
+                  fontWeight: 600,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                  animation: isActive ? 'pulse 2s infinite' : 'none',
+                }}
+                onClick={() => {
+                  onViewChange(menuItem.id)
+                  setExpanded(false)
+                }}
+              >
+                <div style={{
+                  transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                  transition: 'transform 0.3s',
+                }}>
+                  {menuItem.icon}
+                </div>
+                <span style={{
+                  opacity: isActive ? 1 : 0.7,
+                  transition: 'opacity 0.3s',
+                }}>
+                  {menuItem.label.split(' ')[0]}
+                </span>
+              </button>
+            )
+          })}
+          
+          {visibleItems.length > 4 && (
+            <button
+              style={{
+                width: '52px',
+                height: '52px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: expanded ? 'var(--accent-primary)' : 'var(--bg-secondary)',
+                color: expanded ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                border: 'none',
+                borderRadius: '16px',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                transform: expanded ? 'rotate(45deg)' : 'rotate(0deg)',
+              }}
+              onClick={() => setExpanded(!expanded)}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="6" r="1.5" fill="currentColor"/>
+                <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                <circle cx="12" cy="18" r="1.5" fill="currentColor"/>
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {expanded && visibleItems.length > 4 && (
+          <div style={{
+            marginTop: '12px',
+            paddingTop: '12px',
+            borderTop: '1px solid var(--border-color)',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '8px',
+            animation: 'slideUp 0.3s ease',
+          }}>
+            {visibleItems.slice(4).map(menuItem => {
+              const isActive = currView === menuItem.id
+              return (
+                <button
+                  key={menuItem.id}
+                  style={{
+                    height: '64px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    background: isActive ? 'var(--accent-primary)' : 'var(--bg-secondary)',
+                    color: isActive ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                    border: 'none',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    transition: 'all 0.2s',
+                  }}
+                  onClick={() => {
+                    onViewChange(menuItem.id)
+                    setExpanded(false)
+                  }}
+                >
+                  {menuItem.icon}
+                  <span style={{ textAlign: 'center', lineHeight: '1.2' }}>
+                    {menuItem.label}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )}
       </nav>
-    </aside>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+          50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+    </>
   )
 }
 

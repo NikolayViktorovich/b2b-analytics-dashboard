@@ -9,23 +9,23 @@ const Header = () => {
   }
 
   const header: React.CSSProperties = {
-    height: '80px',
+    height: 'clamp(60px, 10vw, 80px)',
     background: 'var(--bg-primary)',
     borderBottom: '1px solid var(--border-color)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '0 32px',
+    padding: '0 clamp(12px, 3vw, 32px)',
   }
 
   const left: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '24px',
+    gap: 'clamp(12px, 2vw, 24px)',
   }
 
   const date: React.CSSProperties = {
-    fontSize: '24px',
+    fontSize: 'clamp(16px, 3vw, 24px)',
     fontWeight: 600,
     color: 'var(--text-primary)',
   }
@@ -33,22 +33,22 @@ const Header = () => {
   const right: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
+    gap: 'clamp(8px, 1.5vw, 16px)',
   }
 
   const userBox: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    padding: '8px 12px',
+    gap: 'clamp(8px, 1.5vw, 12px)',
+    padding: 'clamp(6px, 1vw, 8px) clamp(8px, 1.5vw, 12px)',
     background: 'var(--bg-card)',
-    borderRadius: '12px',
+    borderRadius: 'clamp(10px, 1.5vw, 12px)',
     border: '1px solid var(--border-color)',
   }
 
   const avatar: React.CSSProperties = {
-    width: '36px',
-    height: '36px',
+    width: 'clamp(32px, 5vw, 36px)',
+    height: 'clamp(32px, 5vw, 36px)',
     borderRadius: '50%',
     background: 'var(--accent-primary)',
     color: 'var(--bg-primary)',
@@ -56,28 +56,30 @@ const Header = () => {
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: 700,
-    fontSize: '14px',
+    fontSize: 'clamp(12px, 2vw, 14px)',
   }
 
   const info: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    gap: '2px',
+    gap: 'clamp(1px, 0.3vw, 2px)',
   }
 
   const name: React.CSSProperties = {
-    fontSize: '14px',
+    fontSize: 'clamp(12px, 2vw, 14px)',
     fontWeight: 500,
     color: 'var(--text-primary)',
   }
 
   const btn: React.CSSProperties = {
-    fontSize: '12px',
+    fontSize: 'clamp(10px, 1.5vw, 12px)',
     color: 'var(--text-muted)',
     background: 'transparent',
     padding: 0,
     textAlign: 'left',
     transition: 'color 0.2s',
+    border: 'none',
+    cursor: 'pointer',
   }
 
   return (
