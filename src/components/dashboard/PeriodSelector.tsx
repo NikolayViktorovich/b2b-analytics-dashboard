@@ -16,12 +16,7 @@ const PeriodSelector = ({ value, onChange }: Props) => {
 
   const fmt = (dateStr: string) => {
     if (!dateStr) return 'Выберите дату'
-    const d = new Date(dateStr)
-    return d.toLocaleDateString('ru-RU', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    })
+    return new Date(dateStr).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 
   const handlePreset = (preset: string) => {
@@ -64,9 +59,7 @@ const PeriodSelector = ({ value, onChange }: Props) => {
     setShowPresets(false)
   }
 
-  const handleReset = () => {
-    onChange({ start: '', end: '' })
-  }
+  const handleReset = () => onChange({ start: '', end: '' })
   const containerStyle: React.CSSProperties = {
     background: 'transparent',
     border: 'none',
@@ -330,7 +323,6 @@ const PresetsMenu = ({ anchorEl, onSelect, onClose }: PresetsMenuProps) => {
     borderRadius: '12px',
     padding: '8px',
     minWidth: '220px',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
     animation: 'slideDown 0.2s ease-out',
     zIndex: 1000,
   }

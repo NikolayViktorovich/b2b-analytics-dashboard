@@ -1,44 +1,10 @@
-import { useState, useEffect } from 'react'
-import StatCard from '../widgets/StatCard'
-import RevenueChart from '../widgets/RevenueChart'
-import SourcesChart from '../widgets/SourcesChart'
-import ProductTable from '../widgets/ProductTable'
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { dashboardApi } from '@/services/api'
 
-const mockStats = [
-  { id: 'sales', label: 'Общие продажи', value: '$210,578', change: 12.5, subtitle: 'Среднее значение продаж' },
-  { id: 'orders', label: 'Всего заказов', value: '1245', change: -3.5, subtitle: 'Среднее количество заказов' },
-  { id: 'conversion', label: 'Конверсия', value: '8.5%', change: 4.3, subtitle: 'Средний процент конверсии' },
-  { id: 'avg', label: 'Средний чек', value: '$150.40', change: 8.2, subtitle: 'Средняя стоимость заказа' },
-]
-
-const revData = [
-  { month: 'Янв', value: 45000 },
-  { month: 'Фев', value: 52000 },
-  { month: 'Мар', value: 48000 },
-  { month: 'Апр', value: 61000 },
-  { month: 'Май', value: 55000 },
-  { month: 'Июн', value: 67000 },
-  { month: 'Июл', value: 58000 },
-  { month: 'Авг', value: 72000 },
-  { month: 'Сен', value: 65000 },
-  { month: 'Окт', value: 58000 },
-  { month: 'Ноя', value: 70000 },
-  { month: 'Дек', value: 68000 },
-]
-
-const mockSourceData = [
-  { name: 'Электронная коммерция', value: 1376, color: '#6366f1' },
-  { name: 'Веб-сайт', value: 234, color: '#3b82f6' },
-  { name: 'Социальные сети', value: 850, color: '#8b5cf6' },
-]
-
-const mockProducts = [
-  { name: 'Nike Air Max Shoe', brand: 'Nike', quantity: 1250, price: 95.00, earning: 95.00 },
-  { name: 'MacBook Pro', brand: 'Apple', quantity: 1850, price: 27.00, earning: 95.00 },
-  { name: 'Nike Air Jordan', brand: 'Nike', quantity: 40, price: 34.00, earning: 95.00 },
-  { name: 'Amazon Echo', brand: 'Amazon', quantity: 95, price: 85.00, earning: 95.00 },
-  { name: 'iPhone 16 Pro Max', brand: 'Apple', quantity: 80, price: 36.00, earning: 95.00 },
-]
+const StatCard = lazy(() => import('../widgets/StatCard'))
+const RevenueChart = lazy(() => import('../widgets/RevenueChart'))
+const SourcesChart = lazy(() => import('../widgets/SourcesChart'))
+const ProductTable = lazy(() => import('../widgets/ProductTable'))
 
 type WidgetOrder = string[]
 
@@ -48,13 +14,32 @@ const MainDashboard = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [order, setOrder] = useState<WidgetOrder>(defaultOrder)
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
+  const [dashboardData, setDashboardData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [period] = useState('today')
 
   useEffect(() => {
     const saved = localStorage.getItem('widget-order')
-    if (saved) {
-      setOrder(JSON.parse(saved))
-    }
+    if (saved) setOrder(JSON.parse(saved))
   }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await dashboardApi.getStats(period)
+        setDashboardData(data)
+      } catch(error: any) {
+        setError(error.message || 'Failed to load data')
+        setDashboardData(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [period])
 
   const onDragStart = (e: React.DragEvent, id: string) => {
     if (!isEditMode) return
@@ -84,110 +69,62 @@ const MainDashboard = () => {
     setDraggedItem(null)
   }
 
-  const onDragEnd = () => {
-    setDraggedItem(null)
-  }
+  const onDragEnd = () => setDraggedItem(null)
 
   const resetOrder = () => {
     setOrder(defaultOrder)
     localStorage.removeItem('widget-order')
   }
 
-  const containerStyle: React.CSSProperties = {
-    padding: 'clamp(16px, 3vw, 32px)',
-    maxWidth: '100%',
-    width: '100%',
-    boxSizing: 'border-box',
-  }
+  const stats = dashboardData?.stats ? [
+    { 
+      id: 'sales', 
+      label: 'Выручка', 
+      value: `$${(dashboardData.stats.revenue?.value || 0).toLocaleString()}`, 
+      change: dashboardData.stats.revenue?.change || 0, 
+      subtitle: 'Общая выручка' 
+    },
+    { 
+      id: 'orders', 
+      label: 'Заказы', 
+      value: (dashboardData.stats.orders?.value || 0).toLocaleString(), 
+      change: dashboardData.stats.orders?.change || 0, 
+      subtitle: 'Всего заказов' 
+    },
+    { 
+      id: 'conversion', 
+      label: 'Клиенты', 
+      value: (dashboardData.stats.customers?.value || 0).toLocaleString(), 
+      change: dashboardData.stats.customers?.change || 0, 
+      subtitle: 'Всего клиентов' 
+    },
+    { 
+      id: 'avg', 
+      label: 'Конверсия', 
+      value: `${dashboardData.stats.conversion?.value || 0}%`, 
+      change: dashboardData.stats.conversion?.change || 0, 
+      subtitle: 'Процент конверсии' 
+    },
+  ] : []
 
-  const headerStyle: React.CSSProperties = {
-    marginBottom: 'clamp(20px, 3vw, 32px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: 'clamp(12px, 2vw, 16px)',
-  }
+  const revData = Array.isArray(dashboardData?.revenueChart) ? dashboardData.revenueChart.map((item: any) => ({
+    month: new Date(item.date).toLocaleDateString('ru', { month: 'short' }),
+    value: item.revenue || 0
+  })) : []
 
-  const titleBlk: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'clamp(4px, 1vw, 8px)',
-  }
+  const sourceData = Array.isArray(dashboardData?.trafficSources) ? dashboardData.trafficSources.map((item: any, idx: number) => ({
+    name: item.source || 'Unknown',
+    value: item.value || 0,
+    color: ['#6366f1', '#3b82f6', '#8b5cf6', '#ec4899'][idx % 4]
+  })) : []
 
-  const h1Style: React.CSSProperties = {
-    fontSize: 'clamp(20px, 3vw, 28px)',
-    fontWeight: 700,
-    marginBottom: '0',
-  }
-
-  const subtitleStyle: React.CSSProperties = {
-    color: 'var(--text-muted)',
-    fontSize: 'clamp(12px, 1.5vw, 14px)',
-  }
-
-  const hintStyle: React.CSSProperties = {
-    color: 'var(--accent-primary)',
-    fontSize: 'clamp(11px, 1.2vw, 12px)',
-    marginTop: 'clamp(2px, 0.5vw, 4px)',
-    display: isEditMode ? 'block' : 'none',
-  }
-
-  const actionsStyle: React.CSSProperties = {
-    display: 'flex',
-    gap: 'clamp(8px, 1.5vw, 12px)',
-    alignItems: 'center',
-  }
-
-  const iconBtnStyle: React.CSSProperties = {
-    width: 'clamp(36px, 5vw, 44px)',
-    height: 'clamp(36px, 5vw, 44px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 'clamp(8px, 1.2vw, 10px)',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    background: isEditMode ? 'var(--accent-primary)' : 'var(--bg-card)',
-    color: isEditMode ? 'var(--bg-primary)' : 'var(--text-secondary)',
-    border: isEditMode ? 'none' : '1px solid var(--border-color)',
-    position: 'relative',
-  }
-
-  const tooltipStyle: React.CSSProperties = {
-    position: 'absolute',
-    bottom: '-40px',
-    right: '0',
-    background: 'var(--bg-card)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '8px',
-    padding: '8px 12px',
-    whiteSpace: 'nowrap',
-    fontSize: '12px',
-    fontWeight: 500,
-    color: 'var(--text-primary)',
-    pointerEvents: 'none',
-    opacity: 0,
-    transform: 'translateY(-4px)',
-    transition: 'all 0.2s',
-    zIndex: 1000,
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-  }
-
-  const btnSec: React.CSSProperties = {
-    width: 'clamp(36px, 5vw, 44px)',
-    height: 'clamp(36px, 5vw, 44px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 'clamp(8px, 1.2vw, 10px)',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    background: 'var(--bg-card)',
-    color: 'var(--text-secondary)',
-    border: '1px solid var(--border-color)',
-    position: 'relative',
-  }
+  const products = Array.isArray(dashboardData?.topProducts) ? dashboardData.topProducts.map((item: any) => ({
+    name: item.name || 'Unknown',
+    brand: 'Brand',
+    quantity: item.sales || 0,
+    price: item.sales > 0 ? Number((item.revenue / item.sales).toFixed(2)) : 0,
+    earning: item.revenue || 0
+  })) : []
 
   const widgetStyle = (id: string): React.CSSProperties => ({
     cursor: isEditMode ? 'move' : 'default',
@@ -198,27 +135,24 @@ const MainDashboard = () => {
     borderRadius: 'clamp(12px, 2vw, 16px)',
   })
 
-  const statsGridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(200px, 25vw, 240px), 1fr))',
-    gap: 'clamp(16px, 2.5vw, 20px)',
-    marginBottom: 'clamp(20px, 3vw, 24px)',
-  }
-
-  const chartsGrid: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: '1fr 400px',
-    gridAutoRows: '400px',
-    gap: 'clamp(16px, 2.5vw, 20px)',
-    marginBottom: 'clamp(20px, 3vw, 24px)',
-  }
-
-  const sectionStyle: React.CSSProperties = {
-    marginBottom: 'clamp(20px, 3vw, 24px)',
-  }
+  const LoadingCard = () => (
+    <div style={{
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-color)',
+      borderRadius: '16px',
+      padding: '16px',
+      height: '400px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'var(--text-muted)',
+    }}>
+      Загрузка...
+    </div>
+  )
 
   const renderWidget = (id: string) => {
-    const stat = mockStats.find(s => s.id === id)
+    const stat = stats.find(s => s.id === id)
     
     if (stat) {
       return (
@@ -231,10 +165,14 @@ const MainDashboard = () => {
           onDragEnd={onDragEnd}
           style={widgetStyle(id)}
         >
-          <StatCard {...stat} />
+          <Suspense fallback={<LoadingCard />}>
+            <StatCard {...stat} />
+          </Suspense>
         </div>
       )
     }
+
+    const sectionStyle: React.CSSProperties = { marginBottom: 'clamp(16px, 2.5vw, 24px)' }
 
     switch (id) {
       case 'revenue':
@@ -248,7 +186,9 @@ const MainDashboard = () => {
             onDragEnd={onDragEnd}
             style={{ ...widgetStyle(id), ...sectionStyle }}
           >
-            <RevenueChart data={revData} />
+            <Suspense fallback={<LoadingCard />}>
+              <RevenueChart data={revData} />
+            </Suspense>
           </div>
         )
       case 'sources':
@@ -262,7 +202,9 @@ const MainDashboard = () => {
             onDragEnd={onDragEnd}
             style={{ ...widgetStyle(id), ...sectionStyle }}
           >
-            <SourcesChart data={mockSourceData} />
+            <Suspense fallback={<LoadingCard />}>
+              <SourcesChart data={sourceData} />
+            </Suspense>
           </div>
         )
       case 'products':
@@ -276,7 +218,9 @@ const MainDashboard = () => {
             onDragEnd={onDragEnd}
             style={{ ...widgetStyle(id), ...sectionStyle }}
           >
-            <ProductTable products={mockProducts} />
+            <Suspense fallback={<LoadingCard />}>
+              <ProductTable products={products} />
+            </Suspense>
           </div>
         )
       default:
@@ -293,6 +237,14 @@ const MainDashboard = () => {
     const together = indices.length === 3 && indices[1] === indices[0] + 1 && indices[2] === indices[1] + 1
     
     if(together && order[indices[0]] === 'revenue') {
+      const chartsGrid: React.CSSProperties = {
+        display: window.innerWidth >= 1024 ? 'grid' : 'flex',
+        gridTemplateColumns: window.innerWidth >= 1024 ? '2fr 1fr' : '1fr',
+        flexDirection: 'column',
+        gap: 'clamp(12px, 2vw, 16px)',
+        marginBottom: 'clamp(16px, 2.5vw, 24px)',
+      }
+
       return (
         <div className="charts-grid" style={chartsGrid}>
           <div
@@ -304,7 +256,9 @@ const MainDashboard = () => {
             onDragEnd={onDragEnd}
             style={{...widgetStyle('revenue'), gridColumn: '1', gridRow: '1'}}
           >
-            <RevenueChart data={revData} />
+            <Suspense fallback={<LoadingCard />}>
+              <RevenueChart data={revData} />
+            </Suspense>
           </div>
           <div
             key="sources"
@@ -315,7 +269,9 @@ const MainDashboard = () => {
             onDragEnd={onDragEnd}
             style={{...widgetStyle('sources'), gridColumn: '2', gridRow: '1 / 3'}}
           >
-            <SourcesChart data={mockSourceData} />
+            <Suspense fallback={<LoadingCard />}>
+              <SourcesChart data={sourceData} />
+            </Suspense>
           </div>
           <div
             key="products"
@@ -326,7 +282,9 @@ const MainDashboard = () => {
             onDragEnd={onDragEnd}
             style={{...widgetStyle('products'), gridColumn: '1', gridRow: '2'}}
           >
-            <ProductTable products={mockProducts} />
+            <Suspense fallback={<LoadingCard />}>
+              <ProductTable products={products} />
+            </Suspense>
           </div>
         </div>
       )
@@ -335,74 +293,125 @@ const MainDashboard = () => {
     return null
   }
 
-  return (
-    <div style={containerStyle}>
-      <div style={headerStyle}>
-        <div style={titleBlk}>
-          <h1 style={h1Style}>Аналитика продаж</h1>
-          <p style={subtitleStyle}>Полный отчет по аналитике и статистике</p>
-          <p style={hintStyle}>Перетаскивайте виджеты для изменения порядка</p>
+  if (loading) {
+    return (
+      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+        Загрузка данных...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+        <p style={{ color: '#f87171', marginBottom: '8px' }}>Ошибка: {error}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          style={{
+            marginTop: '16px',
+            padding: '8px 16px',
+            background: 'var(--accent-primary)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          Попробовать снова
+        </button>
+      </div>
+    )
+  }
+
+  if (!dashboardData) {
+    return (
+      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+        <p>Нет данных для отображения</p>
+        <button 
+          onClick={() => window.location.reload()}
+          style={{
+            marginTop: '16px',
+            padding: '8px 16px',
+            background: 'var(--accent-primary)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          Обновить
+        </button>
+      </div>
+    )
+  }
+
+  try {
+    return (
+    <div style={{ padding: 'clamp(12px, 2.5vw, 24px)', maxWidth: '100%', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ marginBottom: 'clamp(16px, 2.5vw, 24px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'clamp(12px, 2vw, 16px)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 1vw, 8px)' }}>
+          <h1 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 700, marginBottom: '0' }}>
+            Аналитика продаж
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: 'clamp(12px, 1.5vw, 14px)' }}>
+            Полный отчет по аналитике и статистике
+          </p>
+          {isEditMode && (
+            <p style={{ color: 'var(--accent-primary)', fontSize: 'clamp(11px, 1.2vw, 12px)', marginTop: 'clamp(2px, 0.5vw, 4px)' }}>
+              Перетаскивайте виджеты для изменения порядка
+            </p>
+          )}
         </div>
-        <div style={actionsStyle}>
+        <div style={{ display: 'flex', gap: 'clamp(8px, 1.5vw, 12px)', alignItems: 'center' }}>
           <button 
-            style={iconBtnStyle}
+            style={{
+              width: 'clamp(36px, 5vw, 44px)',
+              height: 'clamp(36px, 5vw, 44px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 'clamp(8px, 1.2vw, 10px)',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              background: isEditMode ? 'var(--accent-primary)' : 'var(--bg-card)',
+              color: isEditMode ? 'var(--bg-primary)' : 'var(--text-secondary)',
+              border: isEditMode ? 'none' : '1px solid var(--border-color)',
+            }}
             onClick={() => setIsEditMode(!isEditMode)}
-            onMouseEnter={(e) => {
-              const tooltip = e.currentTarget.querySelector('.tooltip') as HTMLElement
-              if (tooltip) {
-                tooltip.style.opacity = '1'
-                tooltip.style.transform = 'translateY(0)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              const tooltip = e.currentTarget.querySelector('.tooltip') as HTMLElement
-              if (tooltip) {
-                tooltip.style.opacity = '0'
-                tooltip.style.transform = 'translateY(-4px)'
-              }
-            }}
           >
             {isEditMode ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             ) : (
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
                 <rect x="11" y="2" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
                 <rect x="2" y="11" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
                 <rect x="11" y="11" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
               </svg>
             )}
-            <span className="tooltip" style={tooltipStyle}>
-              {isEditMode ? 'Сохранить изменения' : 'Изменить виджеты'}
-            </span>
           </button>
           {isEditMode && (
             <button 
-              style={btnSec}
+              style={{
+                width: 'clamp(36px, 5vw, 44px)',
+                height: 'clamp(36px, 5vw, 44px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 'clamp(8px, 1.2vw, 10px)',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                background: 'var(--bg-card)',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border-color)',
+              }}
               onClick={resetOrder}
-              onMouseEnter={(e) => {
-                const tooltip = e.currentTarget.querySelector('.tooltip') as HTMLElement
-                if (tooltip) {
-                  tooltip.style.opacity = '1'
-                  tooltip.style.transform = 'translateY(0)'
-                }
-              }}
-              onMouseLeave={(e) => {
-                const tooltip = e.currentTarget.querySelector('.tooltip') as HTMLElement
-                if (tooltip) {
-                  tooltip.style.opacity = '0'
-                  tooltip.style.transform = 'translateY(-4px)'
-                }
-              }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path d="M21 2v6h-6M3 12a9 9 0 0115-6.7L21 8M3 22v-6h6M21 12a9 9 0 01-15 6.7L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <span className="tooltip" style={tooltipStyle}>
-                Сбросить расположение
-              </span>
             </button>
           )}
         </div>
@@ -415,7 +424,12 @@ const MainDashboard = () => {
           const statsInOrder = order.filter(orderId => statIds.includes(orderId))
           if(id === statsInOrder[0]) {
             return (
-              <div key="stats-grid" className="stats-grid" style={statsGridStyle}>
+              <div key="stats-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(200px, 25vw, 240px), 1fr))',
+                gap: 'clamp(12px, 2vw, 16px)',
+                marginBottom: 'clamp(16px, 2.5vw, 24px)',
+              }}>
                 {statsInOrder.map(statId => renderWidget(statId))}
               </div>
             )
@@ -444,7 +458,28 @@ const MainDashboard = () => {
         return renderWidget(id)
       })}
     </div>
-  )
+    )
+  } catch(err: any) {
+    return (
+      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+        <p style={{ color: '#f87171', marginBottom: '8px' }}>Ошибка рендера: {err.message}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          style={{
+            marginTop: '16px',
+            padding: '8px 16px',
+            background: 'var(--accent-primary)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          Перезагрузить
+        </button>
+      </div>
+    )
+  }
 }
 
 export default MainDashboard
