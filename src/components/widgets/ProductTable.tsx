@@ -85,8 +85,8 @@ const ProductTable = ({ products }: Props) => {
                 <td style={td}>{product.name}</td>
                 <td style={td}>{product.brand}</td>
                 <td style={td}>{product.quantity}</td>
-                <td style={td}>${product.price.toFixed(2)}</td>
-                <td style={td}>${product.earning.toFixed(2)}</td>
+                <td style={td}>${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}</td>
+                <td style={td}>${typeof product.earning === 'number' ? product.earning.toFixed(2) : product.earning}</td>
               </tr>
             ))}
           </tbody>

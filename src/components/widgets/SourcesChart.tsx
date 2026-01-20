@@ -151,7 +151,6 @@ const SourcesChart = ({ data }: Props) => {
     borderRadius: '12px',
     padding: '12px 16px',
     minWidth: '140px',
-    boxShadow: `0 8px 24px ${ttData?.color || '#000'}40`,
     animation: 'slideIn 0.3s ease-out',
   }
 
@@ -286,7 +285,6 @@ const SourcesChart = ({ data }: Props) => {
                   height: '10px', 
                   borderRadius: '3px', 
                   background: item.color,
-                  boxShadow: activeIdx === idx ? `0 0 8px ${item.color}` : 'none',
                   transition: 'all 0.2s',
                 }} />
                 <span>{item.name}</span>

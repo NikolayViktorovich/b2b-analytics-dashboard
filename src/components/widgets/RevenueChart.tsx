@@ -92,7 +92,6 @@ const RevenueChart = ({ data }: P) => {
     fontSize: '12px',
     pointerEvents: 'none' as const,
     zIndex: 10,
-    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
   }
 
   const lbls = {
