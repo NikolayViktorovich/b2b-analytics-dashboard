@@ -113,7 +113,6 @@ const NPSTrend = ({ data }: P) => {
     padding: '8px 12px',
     whiteSpace: 'nowrap',
     fontSize: '12px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
     zIndex: 10,
   }
 
