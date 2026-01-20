@@ -64,9 +64,10 @@ const TrafficOverview = ({ data }: P) => {
   }
 
   const statsGrid: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-    gap: '16px',
+    display: window.innerWidth >= 768 ? 'grid' : 'flex',
+    gridTemplateColumns: window.innerWidth >= 768 ? 'repeat(auto-fit, minmax(140px, 1fr))' : '1fr',
+    flexDirection: 'column',
+    gap: 'clamp(12px, 2vw, 16px)',
   }
 
   const statStyle: React.CSSProperties = {
