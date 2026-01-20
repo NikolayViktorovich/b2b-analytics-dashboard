@@ -6,6 +6,7 @@ export interface User {
   name: string
   role: UserRole
   avatar?: string
+  permissions?: Permission[]
 }
 
 export interface AuthState {
@@ -17,10 +18,31 @@ export interface AuthState {
 export type Permission = 
   | 'dashboard:view'
   | 'dashboard:edit'
-  | 'dashboard:delete'
-  | 'widget:create'
-  | 'widget:edit'
-  | 'widget:delete'
-  | 'export:pdf'
-  | 'export:excel'
+  | 'analytics:view'
+  | 'analytics:export'
+  | 'nps:view'
+  | 'nps:manage'
+  | 'website:view'
+  | 'settings:view'
+  | 'settings:edit'
+  | 'users:view'
   | 'users:manage'
+  | 'roles:manage'
+
+export interface RoleUpdate {
+  userId: string
+  role: UserRole
+  permissions: Permission[]
+  updatedBy: string
+  timestamp: number
+}
+
+export interface GAMetrics {
+  activeUsers: number
+  sessions: number
+  pageViews: number
+  bounceRate: number
+  avgSessionDuration: number
+  topPages: Array<{path: string, views: number}>
+  trafficSources: Array<{source: string, users: number}>
+}
