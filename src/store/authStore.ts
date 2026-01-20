@@ -1,11 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { User, AuthState } from '@/types'
+import type { User, AuthState, UserRole } from '@/types'
+import { rolePermissions } from '@/utils/permissions'
 
 interface AuthStore extends AuthState {
-  login: (email: string, password: string) => Promise<void>
+  loginWithGoogle: (credential: string, accessCode: string) => Promise<any>
   logout: () => void
   setUser: (user: User) => void
+  updateRole: (role: UserRole) => void
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -15,34 +17,33 @@ export const useAuthStore = create<AuthStore>()(
       isAuth: false,
       token: null,
 
-      login: async (email: string, _pwd: string) => {
-        await new Promise(resolve => setTimeout(resolve, 800))
-        
-        const mockUser: User = {
-          id: '1',
-          email,
-          name: email.split('@')[0],
-          role: email.includes('admin') ? 'admin' : 'manager',
-        }
+  loginWithGoogle: async (credential: string, accessCode: string) => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+    const res = await fetch(`${apiUrl}/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential, accessCode }),
+    })
 
-        set({
-          user: mockUser,
-          isAuth: true,
-          token: 'mock-jwt-token',
-        })
-      },
+    if (!res.ok) throw new Error('Auth failed')
 
-      logout: () => {
-        set({
-          user: null,
-          isAuth: false,
-          token: null,
-        })
-      },
+    const data = await res.json()
+    set({
+      user: { ...data.user, permissions: rolePermissions[data.user.role as UserRole] },
+      isAuth: true,
+      token: data.token,
+    })
+    
+    return data
+  },
 
-      setUser: (user: User) => {
-        set({ user })
-      },
+      logout: () => set({ user: null, isAuth: false, token: null }),
+
+      setUser: (user: User) => set({ user }),
+
+      updateRole: (role: UserRole) => set(state => ({
+        user: state.user ? { ...state.user, role, permissions: rolePermissions[role] } : null,
+      })),
     }),
     {
       name: 'auth-storage',
