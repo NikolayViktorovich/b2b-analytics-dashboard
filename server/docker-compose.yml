@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: reddix-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: reddix
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - reddix-network
+
+  server:
+    build: .
+    container_name: reddix-server
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/reddix
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-key}
+      - PORT=3001
+    depends_on:
+      - mongodb
+    networks:
+      - reddix-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  reddix-network:
+    driver: bridge
