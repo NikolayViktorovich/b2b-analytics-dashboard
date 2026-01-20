@@ -1,51 +1,11 @@
-import { useState, useEffect } from 'react'
-import NPSScore from '@/components/nps/NPSScore'
-import NPSTrend from '@/components/nps/NPSTrend'
-import NPSDistribution from '@/components/nps/NPSDistribution'
-import NPSReviews from '@/components/nps/NPSReviews'
-import NPSCategories from '@/components/nps/NPSCategories'
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { npsApi } from '@/services/api'
 
-const npsData = {
-  curr: 42,
-  prev: 38,
-  change: 4,
-  total: 1247,
-  promoters: 587,
-  passives: 423,
-  detractors: 237,
-}
-
-const trendData = [
-  { month: 'Янв', score: 35 },
-  { month: 'Фев', score: 38 },
-  { month: 'Мар', score: 36 },
-  { month: 'Апр', score: 40 },
-  { month: 'Май', score: 39 },
-  { month: 'Июн', score: 42 },
-]
-
-const distData = [
-  { name: 'Промоутеры', value: 587, color: '#4ade80', percent: 47 },
-  { name: 'Нейтралы', value: 423, color: '#fbbf24', percent: 34 },
-  { name: 'Критики', value: 237, color: '#f87171', percent: 19 },
-]
-
-const reviews = [
-  { id: 1, score: 9, name: 'Алексей М.', date: '2 часа назад', text: 'Отличный сервис, все работает быстро и понятно. Рекомендую!', category: 'Качество' },
-  { id: 2, score: 3, name: 'Мария К.', date: '5 часов назад', text: 'Долгая загрузка страниц, часто зависает. Нужно улучшать производительность.', category: 'Производительность' },
-  { id: 3, score: 10, name: 'Дмитрий П.', date: '1 день назад', text: 'Лучшая панель аналитики, которую я использовал. Все интуитивно понятно.', category: 'Удобство' },
-  { id: 4, score: 7, name: 'Елена С.', date: '1 день назад', text: 'В целом хорошо, но не хватает некоторых функций экспорта данных.', category: 'Функционал' },
-  { id: 5, score: 2, name: 'Игорь В.', date: '2 дня назад', text: 'Слишком дорого для такого функционала. Есть более дешевые аналоги.', category: 'Цена' },
-]
-
-const categories = [
-  { name: 'Качество', count: 342, sentiment: 'positive' as const },
-  { name: 'Удобство', count: 298, sentiment: 'positive' as const },
-  { name: 'Производительность', count: 187, sentiment: 'negative' as const },
-  { name: 'Функционал', count: 156, sentiment: 'neutral' as const },
-  { name: 'Цена', count: 143, sentiment: 'negative' as const },
-  { name: 'Поддержка', count: 121, sentiment: 'positive' as const },
-]
+const NPSScore = lazy(() => import('@/components/nps/NPSScore'))
+const NPSTrend = lazy(() => import('@/components/nps/NPSTrend'))
+const NPSDistribution = lazy(() => import('@/components/nps/NPSDistribution'))
+const NPSReviews = lazy(() => import('@/components/nps/NPSReviews'))
+const NPSCategories = lazy(() => import('@/components/nps/NPSCategories'))
 
 type WidgetOrder = string[]
 const defaultOrder: WidgetOrder = ['score', 'trend', 'distribution', 'reviews', 'categories']
@@ -54,13 +14,92 @@ const NPSPage = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [order, setOrder] = useState<WidgetOrder>(defaultOrder)
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
+  const [npsDataState, setNpsDataState] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const saved = localStorage.getItem('nps-widget-order')
-    if (saved) {
-      setOrder(JSON.parse(saved))
-    }
+    if (saved) setOrder(JSON.parse(saved))
   }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const [current, trend, reviews] = await Promise.all([
+          npsApi.getCurrent(),
+          npsApi.getTrend(),
+          npsApi.getReviews({ limit: 10 })
+        ])
+        setNpsDataState({current, trend, reviews})
+      } catch(error) {
+        setNpsDataState({current: null, trend: [], reviews: []})
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+        Загрузка NPS данных...
+      </div>
+    )
+  }
+
+  if (!npsDataState || !npsDataState.current) {
+    return (
+      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+        <p>Нет данных для отображения</p>
+      </div>
+    )
+  }
+
+  const npsData = npsDataState?.current ? {
+    curr: npsDataState.current.score || 0,
+    prev: 0,
+    change: 0,
+    total: npsDataState.current.totalResponses || 0,
+    promoters: npsDataState.current.promoters || 0,
+    passives: npsDataState.current.passives || 0,
+    detractors: npsDataState.current.detractors || 0,
+  } : {
+    curr: 0,
+    prev: 0,
+    change: 0,
+    total: 0,
+    promoters: 0,
+    passives: 0,
+    detractors: 0
+  }
+
+  const trendData = npsDataState?.trend?.map((item: any) => ({
+    month: new Date(item.date).toLocaleDateString('ru', { month: 'short' }),
+    score: item.score
+  })) || []
+
+  const distData = npsDataState?.current ? [
+    { name: 'Промоутеры', value: npsDataState.current.promoters, color: '#4ade80', percent: Math.round((npsDataState.current.promoters / npsDataState.current.totalResponses) * 100) },
+    { name: 'Нейтралы', value: npsDataState.current.passives, color: '#fbbf24', percent: Math.round((npsDataState.current.passives / npsDataState.current.totalResponses) * 100) },
+    { name: 'Критики', value: npsDataState.current.detractors, color: '#f87171', percent: Math.round((npsDataState.current.detractors / npsDataState.current.totalResponses) * 100) },
+  ] : []
+
+  const reviews = npsDataState?.reviews?.map((item: any, idx: number) => ({
+    id: idx + 1,
+    score: item.score,
+    name: item.customerName,
+    date: new Date(item.date).toLocaleDateString('ru'),
+    text: item.comment,
+    category: item.category
+  })) || []
+
+  const categories = npsDataState?.current?.categories?.map((item: any) => ({
+    name: item.name,
+    count: item.responses,
+    sentiment: item.score > 70 ? 'positive' : item.score < 40 ? 'negative' : 'neutral'
+  })) || []
 
   const onDragStart = (e: React.DragEvent, id: string) => {
     if (!isEditMode) return
@@ -181,7 +220,6 @@ const NPSPage = () => {
     transform: 'translateY(-4px)',
     transition: 'all 0.2s',
     zIndex: 1000,
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
   }
 
   const btnSec: React.CSSProperties = {
@@ -200,9 +238,9 @@ const NPSPage = () => {
   }
 
   const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(280px, 30vw, 400px), 1fr))',
-    gridAutoRows: '400px',
+    display: window.innerWidth >= 1024 ? 'grid' : 'flex',
+    gridTemplateColumns: window.innerWidth >= 1024 ? 'repeat(auto-fill, minmax(400px, 1fr))' : '1fr',
+    flexDirection: 'column',
     gap: 'clamp(12px, 2vw, 16px)',
   }
 
@@ -219,6 +257,22 @@ const NPSPage = () => {
     }
   }
 
+  const LoadingWidget = () => (
+    <div style={{
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-color)',
+      borderRadius: '16px',
+      padding: '16px',
+      height: '400px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'var(--text-muted)',
+    }}>
+      Загрузка...
+    </div>
+  )
+
   const renderWidget = (id: string) => {
     switch (id) {
       case 'score':
@@ -232,7 +286,9 @@ const NPSPage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <NPSScore data={npsData} />
+            <Suspense fallback={<LoadingWidget />}>
+              <NPSScore data={npsData} />
+            </Suspense>
           </div>
         )
       case 'trend':
@@ -246,7 +302,9 @@ const NPSPage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <NPSTrend data={trendData} />
+            <Suspense fallback={<LoadingWidget />}>
+              <NPSTrend data={trendData} />
+            </Suspense>
           </div>
         )
       case 'distribution':
@@ -260,7 +318,9 @@ const NPSPage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <NPSDistribution data={distData} />
+            <Suspense fallback={<LoadingWidget />}>
+              <NPSDistribution data={distData} />
+            </Suspense>
           </div>
         )
       case 'reviews':
@@ -274,7 +334,9 @@ const NPSPage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <NPSReviews reviews={reviews} />
+            <Suspense fallback={<LoadingWidget />}>
+              <NPSReviews reviews={reviews} />
+            </Suspense>
           </div>
         )
       case 'categories':
@@ -288,7 +350,9 @@ const NPSPage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <NPSCategories categories={categories} />
+            <Suspense fallback={<LoadingWidget />}>
+              <NPSCategories categories={categories} />
+            </Suspense>
           </div>
         )
       default:

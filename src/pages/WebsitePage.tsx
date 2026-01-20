@@ -1,46 +1,11 @@
-import { useState, useEffect } from 'react'
-import TrafficOverview from '@/components/website/TrafficOverview'
-import TrafficSources from '@/components/website/TrafficSources'
-import DevicesBreakdown from '@/components/website/DevicesBreakdown'
-import PopularPages from '@/components/website/PopularPages'
-import UserBehavior from '@/components/website/UserBehavior'
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { websiteApi } from '@/services/api'
 
-const trafficData = {
-  total: 45678,
-  unique: 32456,
-  pageviews: 128934,
-  avgDuration: '3:24',
-  bounceRate: 42.3,
-  change: 12.5,
-}
-
-const sourcesData = [
-  { name: 'Organic', value: 18456, percent: 40, color: '#4ade80' },
-  { name: 'Direct', value: 13703, percent: 30, color: '#60a5fa' },
-  { name: 'Social', value: 9136, percent: 20, color: '#a855f7' },
-  { name: 'Referral', value: 4568, percent: 10, color: '#fbbf24' },
-]
-
-const devicesData = [
-  { name: 'Desktop', value: 25407, percent: 55.6, color: '#6366f1' },
-  { name: 'Mobile', value: 16441, percent: 36, color: '#8b5cf6' },
-  { name: 'Tablet', value: 3830, percent: 8.4, color: '#a855f7' },
-]
-
-const pagesData = [
-  { page: '/products', views: 12456, avgTime: '4:32', bounceRate: 35.2, exitRate: 28.4 },
-  { page: '/about', views: 8934, avgTime: '2:18', bounceRate: 52.1, exitRate: 45.3 },
-  { page: '/blog', views: 7823, avgTime: '5:47', bounceRate: 28.9, exitRate: 22.1 },
-  { page: '/contact', views: 5678, avgTime: '1:52', bounceRate: 61.3, exitRate: 58.7 },
-  { page: '/pricing', views: 4567, avgTime: '3:15', bounceRate: 38.6, exitRate: 32.4 },
-]
-
-const behaviorData = {
-  avgPageDepth: 3.8,
-  avgSessionDuration: '3:24',
-  pagesPerSession: 4.2,
-  newVsReturning: { new: 62, returning: 38 },
-}
+const TrafficOverview = lazy(() => import('@/components/website/TrafficOverview'))
+const TrafficSources = lazy(() => import('@/components/website/TrafficSources'))
+const DevicesBreakdown = lazy(() => import('@/components/website/DevicesBreakdown'))
+const PopularPages = lazy(() => import('@/components/website/PopularPages'))
+const UserBehavior = lazy(() => import('@/components/website/UserBehavior'))
 
 type WidgetOrder = string[]
 const defaultOrder: WidgetOrder = ['overview', 'sources', 'devices', 'pages', 'behavior']
@@ -48,13 +13,33 @@ const defaultOrder: WidgetOrder = ['overview', 'sources', 'devices', 'pages', 'b
 const WebsitePage = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [order, setOrder] = useState<WidgetOrder>(defaultOrder)
+  const [websiteData, setWebsiteData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
 
   useEffect(() => {
     const saved = localStorage.getItem('website-widget-order')
-    if (saved) {
-      setOrder(JSON.parse(saved))
+    if (saved) setOrder(JSON.parse(saved))
+  }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const [traffic, sources, devices, pages] = await Promise.all([
+          websiteApi.getTraffic(),
+          websiteApi.getSources(),
+          websiteApi.getDevices(),
+          websiteApi.getPages()
+        ])
+        setWebsiteData({traffic: (traffic as any[])[0], sources, devices, pages})
+      } catch(error) {
+        setWebsiteData({traffic: null, sources: [], devices: [], pages: []})
+      } finally {
+        setLoading(false)
+      }
     }
+    fetchData()
   }, [])
 
   const onDragStart = (e: React.DragEvent, id: string) => {
@@ -84,9 +69,7 @@ const WebsitePage = () => {
     setDraggedItem(null)
   }
 
-  const onDragEnd = () => {
-    setDraggedItem(null)
-  }
+  const onDragEnd = () => setDraggedItem(null)
 
   const applyChanges = () => {
     localStorage.setItem('website-widget-order', JSON.stringify(order))
@@ -97,6 +80,73 @@ const WebsitePage = () => {
     setOrder(defaultOrder)
     localStorage.removeItem('website-widget-order')
   }
+
+  if (loading) {
+    return (
+      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+        Загрузка данных сайта...
+      </div>
+    )
+  }
+
+  if (!websiteData || !websiteData.traffic) {
+    return (
+      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+        <p>Нет данных для отображения</p>
+      </div>
+    )
+  }
+
+  const trafficData = websiteData?.traffic?.traffic ? {
+    total: websiteData.traffic.traffic.sessions || 0,
+    unique: websiteData.traffic.traffic.visitors || 0,
+    pageviews: websiteData.traffic.traffic.pageViews || 0,
+    avgDuration: Math.floor((websiteData.traffic.traffic.avgSessionDuration || 0) / 60) + ':' + ((websiteData.traffic.traffic.avgSessionDuration || 0) % 60).toString().padStart(2, '0'),
+    bounceRate: websiteData.traffic.traffic.bounceRate || 0,
+    change: 0,
+  } : {
+    total: 0,
+    unique: 0,
+    pageviews: 0,
+    avgDuration: '0:00',
+    bounceRate: 0,
+    change: 0
+  }
+
+  const sourcesData = websiteData?.sources?.map((item: any, idx: number) => ({
+    name: item.name,
+    value: item.visitors,
+    percent: item.percentage,
+    color: ['#4ade80', '#60a5fa', '#a855f7', '#fbbf24'][idx % 4]
+  })) || []
+
+  const devicesData = websiteData?.devices?.map((item: any, idx: number) => ({
+    name: item.type,
+    value: item.visitors,
+    percent: item.percentage,
+    color: ['#6366f1', '#8b5cf6', '#a855f7'][idx % 3]
+  })) || []
+
+  const pagesData = websiteData?.pages?.map((item: any) => ({
+    page: item.path,
+    views: item.views,
+    avgTime: Math.floor(item.avgTime / 60) + ':' + (item.avgTime % 60).toString().padStart(2, '0'),
+    bounceRate: item.bounceRate,
+    exitRate: 0
+  })) || []
+
+  const behaviorData = websiteData?.traffic?.behavior ? {
+    avgPageDepth: websiteData.traffic.behavior.avgPagesPerSession || 0,
+    avgSessionDuration: Math.floor((websiteData.traffic.behavior.avgTimeOnPage || 0) / 60) + ':' + ((websiteData.traffic.behavior.avgTimeOnPage || 0) % 60).toString().padStart(2, '0'),
+    pagesPerSession: websiteData.traffic.behavior.avgPagesPerSession || 0,
+    newVsReturning: { new: 62, returning: 38 },
+  } : {
+    avgPageDepth: 0,
+    avgSessionDuration: '0:00',
+    pagesPerSession: 0,
+    newVsReturning: { new: 0, returning: 0 }
+  }
+
   const containerStyle: React.CSSProperties = {
     padding: 'clamp(12px, 2.5vw, 24px)',
     maxWidth: '100%',
@@ -175,7 +225,6 @@ const WebsitePage = () => {
     transform: 'translateY(-4px)',
     transition: 'all 0.2s',
     zIndex: 1000,
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
   }
 
   const btnSec: React.CSSProperties = {
@@ -194,9 +243,9 @@ const WebsitePage = () => {
   }
 
   const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(280px, 30vw, 400px), 1fr))',
-    gridAutoRows: '400px',
+    display: window.innerWidth >= 1024 ? 'grid' : 'flex',
+    gridTemplateColumns: window.innerWidth >= 1024 ? 'repeat(auto-fill, minmax(400px, 1fr))' : '1fr',
+    flexDirection: 'column',
     gap: 'clamp(12px, 2vw, 16px)',
   }
 
@@ -213,6 +262,22 @@ const WebsitePage = () => {
     }
   }
 
+  const LoadingWidget = () => (
+    <div style={{
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-color)',
+      borderRadius: '16px',
+      padding: '16px',
+      height: '400px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'var(--text-muted)',
+    }}>
+      Загрузка...
+    </div>
+  )
+
   const renderWidget = (id: string) => {
     switch (id) {
       case 'overview':
@@ -226,7 +291,9 @@ const WebsitePage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <TrafficOverview data={trafficData} />
+            <Suspense fallback={<LoadingWidget />}>
+              <TrafficOverview data={trafficData} />
+            </Suspense>
           </div>
         )
       case 'sources':
@@ -240,7 +307,9 @@ const WebsitePage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <TrafficSources data={sourcesData} />
+            <Suspense fallback={<LoadingWidget />}>
+              <TrafficSources data={sourcesData} />
+            </Suspense>
           </div>
         )
       case 'devices':
@@ -254,7 +323,9 @@ const WebsitePage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <DevicesBreakdown data={devicesData} />
+            <Suspense fallback={<LoadingWidget />}>
+              <DevicesBreakdown data={devicesData} />
+            </Suspense>
           </div>
         )
       case 'pages':
@@ -268,7 +339,9 @@ const WebsitePage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <PopularPages data={pagesData} />
+            <Suspense fallback={<LoadingWidget />}>
+              <PopularPages data={pagesData} />
+            </Suspense>
           </div>
         )
       case 'behavior':
@@ -282,7 +355,9 @@ const WebsitePage = () => {
             onDragEnd={onDragEnd}
             style={widgetStyle(id)}
           >
-            <UserBehavior data={behaviorData} />
+            <Suspense fallback={<LoadingWidget />}>
+              <UserBehavior data={behaviorData} />
+            </Suspense>
           </div>
         )
       default:
