@@ -130,7 +130,6 @@ const Calendar = ({ value, onChange, onClose, anchorEl }: Props) => {
     borderRadius: '16px',
     padding: '20px',
     width: '320px',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
     animation: 'slideDown 0.2s ease-out',
     zIndex: 1000,
   }
