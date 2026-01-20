@@ -1,18 +1,69 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuthStore } from '@/store/authStore'
+import { api } from '@/services/api'
 
 const NotificationSettings = () => {
+  const { user } = useAuthStore()
   const [emailNotif, setEmailNotif] = useState(true)
   const [pushNotif, setPushNotif] = useState(false)
   const [weeklyReport, setWeeklyReport] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      if (!user?.id) return
+      
+      try {
+        const settings = await api.get(`/users/${user.id}/notifications`) as any
+        if (settings) {
+          setEmailNotif(settings.emailNotifications ?? true)
+          setPushNotif(settings.pushNotifications ?? false)
+          setWeeklyReport(settings.weeklyReport ?? true)
+        }
+      } catch(error) {
+        // silent
+      }
+    }
+    if (user?.id) loadSettings()
+  }, [user?.id])
+
+  const updateSetting = async (key: string, value: boolean) => {
+    if (!user?.id) return
+
+    try {
+      setSaving(true)
+      await api.patch(`/users/${user.id}/notifications`, {[key]: value})
+    } catch(error) {
+      // silent
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleEmailToggle = () => {
+    const newValue = !emailNotif
+    setEmailNotif(newValue)
+    updateSetting('emailNotifications', newValue)
+  }
+
+  const handlePushToggle = () => {
+    const newValue = !pushNotif
+    setPushNotif(newValue)
+    updateSetting('pushNotifications', newValue)
+  }
+
+  const handleWeeklyToggle = () => {
+    const newValue = !weeklyReport
+    setWeeklyReport(newValue)
+    updateSetting('weeklyReport', newValue)
+  }
 
   const cardStyle: React.CSSProperties = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
     padding: '16px',
-    height: '400px',
-    maxHeight: '400px',
-    overflow: 'hidden',
+    overflow: 'visible',
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
@@ -62,8 +113,9 @@ const NotificationSettings = () => {
     borderRadius: '14px',
     background: active ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
     position: 'relative',
-    cursor: 'pointer',
+    cursor: saving ? 'not-allowed' : 'pointer',
     transition: 'all 0.2s',
+    opacity: saving ? 0.6 : 1,
   })
 
   const toggleCircleStyle = (active: boolean): React.CSSProperties => ({
@@ -89,7 +141,7 @@ const NotificationSettings = () => {
           <div style={lblStyle}>Email уведомления</div>
           <div style={descStyle}>Получать письма о важных событиях</div>
         </div>
-        <div style={toggleStyle(emailNotif)} onClick={() => setEmailNotif(!emailNotif)}>
+        <div style={toggleStyle(emailNotif)} onClick={handleEmailToggle}>
           <div style={toggleCircleStyle(emailNotif)} />
         </div>
       </div>
@@ -99,7 +151,7 @@ const NotificationSettings = () => {
           <div style={lblStyle}>Push уведомления</div>
           <div style={descStyle}>Браузерные уведомления</div>
         </div>
-        <div style={toggleStyle(pushNotif)} onClick={() => setPushNotif(!pushNotif)}>
+        <div style={toggleStyle(pushNotif)} onClick={handlePushToggle}>
           <div style={toggleCircleStyle(pushNotif)} />
         </div>
       </div>
@@ -109,7 +161,7 @@ const NotificationSettings = () => {
           <div style={lblStyle}>Еженедельный отчет</div>
           <div style={descStyle}>Сводка по понедельникам</div>
         </div>
-        <div style={toggleStyle(weeklyReport)} onClick={() => setWeeklyReport(!weeklyReport)}>
+        <div style={toggleStyle(weeklyReport)} onClick={handleWeeklyToggle}>
           <div style={toggleCircleStyle(weeklyReport)} />
         </div>
       </div>

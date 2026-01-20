@@ -1,16 +1,44 @@
+import { useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
+import { api } from '@/services/api'
 
 const ProfileSettings = () => {
-  const { user } = useAuthStore()
+  const { user, setUser } = useAuthStore()
+  const [name, setName] = useState(user?.name || '')
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const handleSave = async () => {
+    if (!name.trim()) {
+      setMessage('Имя не может быть пустым')
+      return
+    }
+
+    if (!user?.id) {
+      setMessage('Ошибка: ID пользователя не найден')
+      return
+    }
+
+    try {
+      setSaving(true)
+      setMessage('')
+      await api.patch(`/users/${user.id}`, { name })
+      setUser({ ...user, name })
+      setMessage('Изменения сохранены')
+      setTimeout(() => setMessage(''), 3000)
+    } catch (error) {
+      setMessage('Ошибка сохранения')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   const cardStyle: React.CSSProperties = {
     background: 'var(--bg-card)',
     border: '1px solid var(--border-color)',
     borderRadius: '16px',
     padding: '16px',
-    height: '400px',
-    maxHeight: '400px',
-    overflow: 'hidden',
+    overflow: 'visible',
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
@@ -85,16 +113,29 @@ const ProfileSettings = () => {
     fontSize: '14px',
   }
 
+  const inputDisabledStyle: React.CSSProperties = {
+    ...inputStyle,
+    opacity: 0.6,
+    cursor: 'not-allowed',
+  }
+
   const btnStyle: React.CSSProperties = {
-    background: 'var(--accent-primary)',
+    background: saving ? 'var(--bg-tertiary)' : 'var(--accent-primary)',
     color: 'var(--bg-primary)',
     padding: '12px 24px',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: 600,
-    cursor: 'pointer',
+    cursor: saving ? 'not-allowed' : 'pointer',
     transition: 'all 0.2s',
     marginTop: '8px',
+    border: 'none',
+  }
+
+  const messageStyle: React.CSSProperties = {
+    fontSize: '13px',
+    color: message.includes('Ошибка') ? '#f87171' : '#4ade80',
+    marginTop: '-8px',
   }
 
   return (
@@ -114,20 +155,39 @@ const ProfileSettings = () => {
 
       <div style={fieldStyle}>
         <label style={lblStyle}>Имя</label>
-        <input type="text" defaultValue={user?.name} style={inputStyle} />
+        <input 
+          type="text" 
+          value={name} 
+          onChange={(e) => setName(e.target.value)}
+          style={inputStyle} 
+        />
       </div>
 
       <div style={fieldStyle}>
         <label style={lblStyle}>Email</label>
-        <input type="email" defaultValue={user?.email} style={inputStyle} />
+        <input 
+          type="email" 
+          value={user?.email || ''} 
+          style={inputDisabledStyle} 
+          disabled 
+        />
       </div>
 
       <div style={fieldStyle}>
         <label style={lblStyle}>Роль</label>
-        <input type="text" defaultValue={user?.role} style={inputStyle} disabled />
+        <input 
+          type="text" 
+          value={user?.role || ''} 
+          style={inputDisabledStyle} 
+          disabled 
+        />
       </div>
 
-      <button style={btnStyle}>Сохранить изменения</button>
+      {message && <div style={messageStyle}>{message}</div>}
+
+      <button style={btnStyle} onClick={handleSave} disabled={saving}>
+        {saving ? 'Сохранение...' : 'Сохранить изменения'}
+      </button>
     </div>
   )
 }
